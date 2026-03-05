@@ -5,11 +5,13 @@ import { toast, Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
 import { Eye, EyeOff, Loader2, ShieldCheck } from 'lucide-react';
 import api, { setAccessToken } from '../Services/api';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isError, setIsError] = useState(false); 
+  const navigate = useNavigate()
 
   // --- 1. CURSOR TRACKING LOGIC ---
   const leftPanelRef = useRef(null);
@@ -47,18 +49,25 @@ const Login = () => {
       const response = await api.post("/user/login", data);
 
       if (response.data.accessToken) {
-        // Store SENSITIVE token in memory
+        // 1. Store token in memory
         setAccessToken(response.data.accessToken);
 
-        // Store NON-SENSITIVE info
+        // 2. Store info for the UI
         localStorage.setItem('role', response.data.role);
         localStorage.setItem('userName', response.data.userName);
         
-        // SUCCESS TOAST ONLY (No navigation)
-        toast.success(`Access Granted. Welcome, ${response.data.userName}`, { 
-            id: loginToast,
-            duration: 5000 
-        });
+        toast.success(`Access Granted. Welcome, ${response.data.userName}`, { id: loginToast });
+        
+        // 3. ADD THIS: Redirect based on role
+        setTimeout(() => {
+            if (response.data.role === 'Admin') {
+                navigate('/admin/dashboard');
+            } else if (response.data.role === 'Mentor') {
+                navigate('/mentor/dashboard');
+            } else {
+                navigate('/home');
+            }
+        }, 1500);
       }
     } catch (error) {
       setIsError(true); 
