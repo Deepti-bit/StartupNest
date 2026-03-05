@@ -10,7 +10,7 @@ const generateAccessToken = (userId, role) => {
 
 // Long-lived token for getting new access tokens
 const generateRefreshToken = (userId) => {
-  return jwt.sign({ userId }, REFRESH_SECRET, { expiresIn: "7d" });
+  return jwt.sign({ userId }, REFRESH_SECRET, { expiresIn: "1h" });
 };
 
 const validateToken = (req, res, next) => {
