@@ -161,3 +161,30 @@ exports.refreshToken = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find({ role: { $ne: 'Admin' } }).select('-password');
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.updateUserByAdmin = async (req, res) => {
+    try {
+        const { userId, role, status } = req.body;
+        
+        const updateData = {};
+        if (role) updateData.role = role;
+        if (status) updateData.status = status;
+
+        const user = await User.findByIdAndUpdate(userId, updateData, { new: true });
+        
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        res.status(200).json({ message: "User updated successfully", user });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
