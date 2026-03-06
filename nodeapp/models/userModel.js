@@ -15,8 +15,8 @@ const userSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       validate: {
-        validator: v=>/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(v),
-        message:"Invalid email"
+        validator: (v) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(v),
+        message: "Invalid email format",
       },
       lowercase: true,
     },
@@ -30,16 +30,24 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       validate: {
-        validator:{
-            validate:v=>/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(v),
-            message:"Password should be at least 8 characters long, with one lowercase, one uppercase, with numbers and special characters."
-        }
-      }
+        validator: (v) => /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,}$/.test(v),
+        message: "Password must be at least 6 characters, with one uppercase, one lowercase, and one number.",
+      },
     },
     role: {
       type: String,
       required: true,
+      enum: ['Entrepreneur', 'Mentor', 'Admin'],
       trim: true,
+    },
+    status: {
+      type: String,
+      enum: ['active', 'pending', 'rejected'],
+      default: 'active',
+    },
+    resumePath: {
+      type: String,
+      default: null,
     },
   },
   {
@@ -49,4 +57,3 @@ const userSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model('User', userSchema);
-
