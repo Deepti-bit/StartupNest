@@ -6,18 +6,15 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// --- 1. MULTER CONFIGURATION (For Resume Uploads) ---
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const dir = 'uploads/resumes/';
-        // Create directory if it doesn't exist
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
         }
         cb(null, dir);
     },
     filename: (req, file, cb) => {
-        // Save as: timestamp-originalname.pdf
         cb(null, `${Date.now()}-${file.originalname}`);
     }
 });
@@ -31,28 +28,23 @@ const upload = multer({
         }
         cb(null, true);
     },
-    limits: { fileSize: 5 * 1024 * 1024 } // 5MB Limit
-}).single('resume'); // 'resume' is the field name from frontend
+    limits: { fileSize: 5 * 1024 * 1024 } 
+}).single('resume'); 
 
 
-// --- 2. SIGNUP (ADD USER) ---
 exports.addUser = (req, res) => {
-    // Handle the file upload first
     upload(req, res, async (err) => {
         if (err) return res.status(400).json({ message: err.message });
 
         try {
             const { userName, mobile, email, password, role } = req.body;
 
-            // Check if user already exists
             const existingUser = await User.findOne({ email });
             if (existingUser) return res.status(400).json({ message: "Email already exists" });
 
-            // Hash password
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
 
-            // Logic: Mentors are "pending", others are "active"
             const userStatus = role === 'Mentor' ? 'pending' : 'active';
             const resumePath = req.file ? req.file.path : null;
 
@@ -78,7 +70,6 @@ exports.addUser = (req, res) => {
 };
 
 
-// --- 3. LOGIN ---
 exports.getUserByEmailAndPassword = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -86,11 +77,9 @@ exports.getUserByEmailAndPassword = async (req, res) => {
 
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        // 1. Check Password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
-        // 2. IMPORTANT: Check if account is approved
         if (user.status === 'pending') {
             return res.status(403).json({ 
                 message: "Account pending approval. Please wait for the Admin to verify your resume." 
@@ -101,7 +90,6 @@ exports.getUserByEmailAndPassword = async (req, res) => {
             return res.status(403).json({ message: "Your application was rejected." });
         }
 
-        // 3. Issue Tokens
         const accessToken = generateAccessToken(user._id, user.role);
         const refreshToken = generateRefreshToken(user._id);
 
@@ -124,11 +112,10 @@ exports.getUserByEmailAndPassword = async (req, res) => {
 };
 
 
-// --- 4. ADMIN: GET PENDING MENTORS ---
 exports.getPendingMentors = async (req, res) => {
     try {
         const mentors = await User.find({ role: 'Mentor', status: 'pending' })
-                                  .select('-password'); // Don't send passwords
+                                  .select('-password'); 
         res.status(200).json(mentors);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -136,10 +123,9 @@ exports.getPendingMentors = async (req, res) => {
 };
 
 
-// --- 5. ADMIN: APPROVE/REJECT MENTOR ---
 exports.updateMentorStatus = async (req, res) => {
     try {
-        const { userId, status } = req.body; // status: 'active' or 'rejected'
+        const { userId, status } = req.body; 
         
         if (!['active', 'rejected'].includes(status)) {
             return res.status(400).json({ message: "Invalid status" });
@@ -155,7 +141,6 @@ exports.updateMentorStatus = async (req, res) => {
 };
 
 
-// --- 6. REFRESH TOKEN ---
 exports.refreshToken = async (req, res) => {
     try {
         const refreshToken = req.cookies?.refreshToken;
@@ -163,7 +148,7 @@ exports.refreshToken = async (req, res) => {
 
         jwt.verify(refreshToken, REFRESH_SECRET, async (err, decoded) => {
             if (err) return res.status(403).json({ message: "Invalid refresh token" });
-            
+
             const user = await User.findById(decoded.userId);
             if (!user || user.status !== 'active') {
                 return res.status(403).json({ message: "User not authorized" });

@@ -58,4 +58,4 @@ const EntrepreneurNavbar = () => {
     );
 };
 
-export default EntrepreneurNavbar;
+export default EntrepreneurNavbar
