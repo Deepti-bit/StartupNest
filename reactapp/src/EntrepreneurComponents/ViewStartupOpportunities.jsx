@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -216,3 +217,14 @@ const ViewStartupOpportunities = () => {
 };
 
 export default ViewStartupOpportunities;
+=======
+import React from 'react'
+
+const ViewStartupOpportunities = () => {
+  return (
+    <div>ViewStartupOpportunities</div>
+  )
+}
+
+export default ViewStartupOpportunities
+>>>>>>> 0ea87e6cefdcb8a0801a87c7037a2029be537c03

@@ -17,7 +17,6 @@ const storage = multer.diskStorage({
         cb(null, dir);
     },
     filename: (req, file, cb) => {
-
         cb(null, `${Date.now()}-${file.originalname}`);
     }
 });
@@ -155,7 +154,6 @@ exports.getUserByEmailAndPassword = async (req, res) => {
 };
 
 
-
 exports.getPendingMentors = async (req, res) => {
     try {
         const mentors = await User.find({ role: 'Mentor', status: 'pending' })
@@ -165,7 +163,6 @@ exports.getPendingMentors = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
 
 
 exports.updateMentorStatus = async (req, res) => {
@@ -186,7 +183,6 @@ exports.updateMentorStatus = async (req, res) => {
 };
 
 
-
 exports.refreshToken = async (req, res) => {
     try {
         const refreshToken = req.cookies?.refreshToken;
@@ -194,7 +190,7 @@ exports.refreshToken = async (req, res) => {
 
         jwt.verify(refreshToken, REFRESH_SECRET, async (err, decoded) => {
             if (err) return res.status(403).json({ message: "Invalid refresh token" });
-            
+
             const user = await User.findById(decoded.userId);
             if (!user || user.status !== 'active') {
                 return res.status(403).json({ message: "User not authorized" });
@@ -203,6 +199,33 @@ exports.refreshToken = async (req, res) => {
             const newAccessToken = generateAccessToken(user._id, user.role);
             res.json({ accessToken: newAccessToken });
         });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find({ role: { $ne: 'Admin' } }).select('-password');
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.updateUserByAdmin = async (req, res) => {
+    try {
+        const { userId, role, status } = req.body;
+        
+        const updateData = {};
+        if (role) updateData.role = role;
+        if (status) updateData.status = status;
+
+        const user = await User.findByIdAndUpdate(userId, updateData, { new: true });
+        
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        res.status(200).json({ message: "User updated successfully", user });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
