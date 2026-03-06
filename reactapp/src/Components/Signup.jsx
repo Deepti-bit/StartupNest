@@ -166,7 +166,6 @@ const Signup = () => {
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                
                 <InputField label="Full Name" {...register("username", { required: "Required" })} error={errors.username} darkMode={darkMode} />
                 
                 <div className="grid grid-cols-2 gap-4">

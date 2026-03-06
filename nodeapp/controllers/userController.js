@@ -148,7 +148,7 @@ exports.refreshToken = async (req, res) => {
 
         jwt.verify(refreshToken, REFRESH_SECRET, async (err, decoded) => {
             if (err) return res.status(403).json({ message: "Invalid refresh token" });
-            
+
             const user = await User.findById(decoded.userId);
             if (!user || user.status !== 'active') {
                 return res.status(403).json({ message: "User not authorized" });
