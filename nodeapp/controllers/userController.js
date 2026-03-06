@@ -66,8 +66,8 @@ exports.addUser = (req, res) => {
                 resumePath: resumePath
             });
 
-            const successMessage = role === 'Mentor' 
-                ? "Application submitted. Please wait for Admin approval." 
+            const successMessage = role === 'Mentor'
+                ? "Application submitted. Please wait for Admin approval."
                 : "Registration successful!";
 
             return res.status(201).json({ message: successMessage });
@@ -92,8 +92,8 @@ exports.getUserByEmailAndPassword = async (req, res) => {
 
         // 2. IMPORTANT: Check if account is approved
         if (user.status === 'pending') {
-            return res.status(403).json({ 
-                message: "Account pending approval. Please wait for the Admin to verify your resume." 
+            return res.status(403).json({
+                message: "Account pending approval. Please wait for the Admin to verify your resume."
             });
         }
 
@@ -109,7 +109,7 @@ exports.getUserByEmailAndPassword = async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'Strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000 
+            maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
         return res.status(200).json({
@@ -128,7 +128,7 @@ exports.getUserByEmailAndPassword = async (req, res) => {
 exports.getPendingMentors = async (req, res) => {
     try {
         const mentors = await User.find({ role: 'Mentor', status: 'pending' })
-                                  .select('-password'); // Don't send passwords
+            .select('-password'); // Don't send passwords
         res.status(200).json(mentors);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -140,7 +140,7 @@ exports.getPendingMentors = async (req, res) => {
 exports.updateMentorStatus = async (req, res) => {
     try {
         const { userId, status } = req.body; // status: 'active' or 'rejected'
-        
+
         if (!['active', 'rejected'].includes(status)) {
             return res.status(400).json({ message: "Invalid status" });
         }
@@ -163,7 +163,7 @@ exports.refreshToken = async (req, res) => {
 
         jwt.verify(refreshToken, REFRESH_SECRET, async (err, decoded) => {
             if (err) return res.status(403).json({ message: "Invalid refresh token" });
-            
+
             const user = await User.findById(decoded.userId);
             if (!user || user.status !== 'active') {
                 return res.status(403).json({ message: "User not authorized" });

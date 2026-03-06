@@ -1,12 +1,10 @@
-// src/services/api.js
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: "https://8080-eaecfaabfcdbbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io/api",
-  withCredentials: true, // Required to send/receive cookies
+  baseURL: "https://8080-befbcecccedffbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io/api",
+  withCredentials: true,
 });
 
-// This variable lives only in memory (safe from XSS)
 let accessToken = null;
 
 export const setAccessToken = (token) => {
@@ -15,7 +13,6 @@ export const setAccessToken = (token) => {
 
 export const getAccessToken = () => accessToken;
 
-// Request Interceptor: Attach token to every request
 api.interceptors.request.use((config) => {
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
@@ -23,7 +20,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Response Interceptor: If 403/401, try to refresh
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
