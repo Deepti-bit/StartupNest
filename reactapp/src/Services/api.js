@@ -1,8 +1,13 @@
 import axios from 'axios';
 
 const api = axios.create({
+<<<<<<< HEAD
+  baseURL: "https://8080-eecdbdaddecbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io/api",
+  withCredentials: true, // Required to send/receive cookies
+=======
   baseURL: "https://8080-eaecfaabfcdbbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io/api",
   withCredentials: true,
+>>>>>>> 0ea87e6cefdcb8a0801a87c7037a2029be537c03
 });
 
 let accessToken = null;

@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+      
       validate: {
         validator: (v) => /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,}$/.test(v),
         message: "Password must be at least 6 characters, with one uppercase, one lowercase, and one number.",
@@ -37,17 +38,22 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       required: true,
-      enum: ['Entrepreneur', 'Mentor', 'Admin'],
+      enum: ['Entrepreneur', 'Mentor', 'Admin'], 
       trim: true,
     },
+    
     status: {
       type: String,
       enum: ['active', 'pending', 'rejected'],
       default: 'active',
     },
+    
     resumePath: {
-      type: String,
-      default: null,
+      data: Buffer,                 
+      contentType: String,          
+      filename: String,             
+      size: Number,                 
+      uploadedAt: { type: Date, default: Date.now }
     },
   },
   {
