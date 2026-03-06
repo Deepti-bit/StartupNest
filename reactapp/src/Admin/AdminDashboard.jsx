@@ -18,7 +18,7 @@ const AdminDashboard = () => {
       const res = await api.get('/user/all-users');
       setUsers(res.data);
     } catch (err) {
-      toast.error("Failed to load users");
+      toast.error(err);
     } finally {
       setLoading(false);
     }
@@ -184,14 +184,15 @@ const UserCard = ({ user, index, onUpdate, isLoading, isPendingView }) => {
         {!isPendingView ? (
           <div>
             <label className="text-[8px] font-black uppercase text-slate-400 mb-1 block">Role</label>
+            {/* Added text-slate-900 here to make text black */}
             <select 
-              className="w-full text-[10px] font-bold p-2 bg-slate-50 border-none rounded-lg outline-none"
+              className="w-full text-[10px] font-bold p-2 bg-slate-50 border-none rounded-lg outline-none text-slate-900"
               value={user.role}
               onChange={(e) => onUpdate(user._id, { role: e.target.value })}
               disabled={isLoading}
             >
-              <option value="Mentor">Mentor</option>
-              <option value="Entrepreneur">Entrepreneur</option>
+              <option value="Mentor" className="text-slate-900">Mentor</option>
+              <option value="Entrepreneur" className="text-slate-900">Entrepreneur</option>
             </select>
           </div>
         ) : (

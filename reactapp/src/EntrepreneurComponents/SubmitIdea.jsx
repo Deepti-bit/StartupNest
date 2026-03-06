@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
 import EntrepreneurNavbar from './EntrepreneurNavbar';
+import api from '../Services/api'; 
 
 const SubmitIdea = () => {
   const navigate = useNavigate();
@@ -37,18 +38,31 @@ const SubmitIdea = () => {
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
-    
-    console.log("Submission Payload:", {
-      ...data,
-      mentorId: selectedMentor._id,
-      submissionDate: new Date().toISOString()
-    });
+    try {
+      const formData = new FormData();
+      
+      formData.append('marketPotential', data.marketPotential);
+      formData.append('expectedFunding', data.expectedFunding);
+      formData.append('launchYear', data.launchYear);
+      formData.append('address', data.address);
+      formData.append('mentorId', selectedMentor._id); // This maps to startupProfileId
+      
+      if (data.pitchDeck && data.pitchDeck[0]) {
+        formData.append('pitchDeck', data.pitchDeck[0]);
+      }
 
-    setTimeout(() => {
+      await api.post('/startupSubmission/addStartupSubmission', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
       setIsSubmitting(false);
       setShowSuccess(true);
-      toast.success("Startup Proposal Sent!");
-    }, 2000);
+      toast.success("Startup Proposal Sent Successfully!");
+      
+    } catch (err) {
+      setIsSubmitting(false);
+      toast.error(err.response?.data?.message || "Submission failed");
+    }
   };
 
   return (
@@ -169,7 +183,7 @@ const SubmitIdea = () => {
               </label>
               <div className="relative group">
                 <input 
-                  {...register("pitchDeck", { required: "Please upload your Pitch Deck" })}
+                  {...register("pitchDeck", { required: false })}
                   type="file"
                   accept=".pdf"
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"

@@ -3,20 +3,11 @@ const mongoose = require('mongoose');
 const startupSubmissionSchema = new mongoose.Schema(
   {
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
-    userName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    startupProfileId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'StartupProfile',
-      required: true,
-    },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User', 
+        required: true,
+      },
+      
     submissionDate: {
       type: Date,
       required: true,
@@ -46,11 +37,10 @@ const startupSubmissionSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    pitchDeckFile: {
-      type: String,
-      required: true, 
-      trim: true,
-    },
+    pitchDeck: {
+        type: String, 
+        required: false
+      }
   },
   {
     timestamps: true,
