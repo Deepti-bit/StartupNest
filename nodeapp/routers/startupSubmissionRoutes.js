@@ -8,9 +8,9 @@ router.post('/addStartupSubmission', validateToken, authorize('Entrepreneur'), s
 
 router.get('/getAllStartupSubmissions', validateToken, authorize('Mentor'), startupSubmissionController.getAllStartupSubmissions);
 
-router.get('/getSubmissionsByUserId/:userId', validateToken, startupSubmissionController.getSubmissionsByUserId);
+router.get('/getSubmissionsByUserId/:userId', validateToken,authorize('Entrepreneur'), startupSubmissionController.getSubmissionsByUserId);
 
-router.get('/getStartupSubmissionById/:id', validateToken, startupSubmissionController.getStartupSubmissionById);
+router.get('/getStartupSubmissionById/:id', validateToken,authorize('Mentor'), startupSubmissionController.getStartupSubmissionById);
 
 router.put('/updateStartupSubmission/:id', validateToken, authorize('Mentor'), startupSubmissionController.updateStartupSubmission);
 

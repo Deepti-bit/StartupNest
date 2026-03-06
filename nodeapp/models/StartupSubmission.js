@@ -15,7 +15,7 @@ const startupSubmissionSchema = new mongoose.Schema(
     startupProfileId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'StartupProfile',
-      required: true,
+      required: false,
     },
     submissionDate: {
       type: Date,

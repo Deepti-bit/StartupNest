@@ -9,8 +9,8 @@ router.post('/login', userController.getUserByEmailAndPassword);
 router.get('/refresh', userController.refreshToken);
 
 
-router.get('/pending-mentors', validateToken, userController.getPendingMentors);
-router.post('/approve-mentor', validateToken, userController.updateMentorStatus);
+router.get('/pending-mentors', validateToken,authorize("Admin"), userController.getPendingMentors);
+router.post('/approve-mentor', validateToken,authorize("Admin"), userController.updateMentorStatus);
 
 router.get("/resume/:id", validateToken, authorize("Admin"), userController.getResumeByUserId);
 
