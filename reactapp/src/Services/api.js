@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: "https://8080-befbcecccedffbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io/api",
+  baseURL: "https://8080-eaecfaabfcdbbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io/api",
   withCredentials: true,
 });
 

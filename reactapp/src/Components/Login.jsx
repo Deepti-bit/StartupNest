@@ -20,6 +20,7 @@ const Login = () => {
   const springConfig = { damping: 25, stiffness: 150 };
   const smoothX = useSpring(mouseX, springConfig);
   const smoothY = useSpring(mouseY, springConfig);
+  
 
   const handleLeftPanelMouseMove = (e) => {
     if (!leftPanelRef.current) return;

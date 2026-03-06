@@ -9,7 +9,8 @@ const startupSubmissionSchema = new mongoose.Schema(
         userName: { type: String, required: true },
         startupProfileId: {
             type: mongoose.Schema.Types.ObjectId,
-            required: true, ref: "StartupProfile"
+            required: true,
+            ref: "StartupProfile"
         },
 
         submissionDate: {
