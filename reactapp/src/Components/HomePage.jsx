@@ -20,7 +20,6 @@ const LandingPage = () => {
 
     return (
         <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-indigo-100">
-            <Navbar />
 
             {/* --- HERO SECTION --- */}
             <section className="max-w-7xl mx-auto px-6 pt-16 pb-20 grid lg:grid-cols-2 gap-12 items-center">

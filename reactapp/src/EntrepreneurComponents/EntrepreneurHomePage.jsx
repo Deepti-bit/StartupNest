@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { 
-  Rocket, 
-  Users, 
-  Lightbulb, 
-  PlusCircle,
-  Clock,
-  Loader2,
-  AlertCircle
+  Rocket, Users, Lightbulb, PlusCircle, Loader2, AlertCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../Services/api'; 
@@ -19,8 +13,7 @@ const EntrepreneurHome = () => {
     const [dashboardData, setDashboardData] = useState({
         ideasCount: 0,
         mentorsCount: 0,
-        recentSubmissions: [],
-        upcomingMeetings: []
+        recentSubmissions: []
     });
 
     const userName = localStorage.getItem('userName') || 'Founder';
@@ -29,14 +22,12 @@ const EntrepreneurHome = () => {
         const fetchDashboard = async () => {
             try {
                 setLoading(true);
-                const response = await api.get('/entrepreneur/dashboard');
-                
-                
+                const response = await api.get('/user/entrepreneur/dashboard');
                 setDashboardData(response.data);
                 setError(null);
             } catch (err) {
                 console.error("Dashboard Fetch Error:", err);
-                setError("Failed to load dashboard data. Please try again later.");
+                setError("Failed to load dashboard data. Please check if your server is running.");
             } finally {
                 setLoading(false);
             }
@@ -46,25 +37,14 @@ const EntrepreneurHome = () => {
     }, []);
 
     const statsList = [
-        { 
-            label: 'Ideas Submitted', 
-            value: dashboardData.ideasCount, 
-            icon: <Lightbulb className="text-amber-500" /> 
-        },
-        { 
-            label: 'Active Mentors', 
-            value: dashboardData.mentorsCount, 
-            icon: <Users className="text-blue-500" /> 
-        },
+        { label: 'Ideas Submitted', value: dashboardData.ideasCount, icon: <Lightbulb className="text-amber-500" /> },
+        { label: 'Active Mentors', value: dashboardData.mentorsCount, icon: <Users className="text-blue-500" /> },
     ];
 
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="animate-spin text-indigo-600" size={40} />
-                    <p className="text-gray-500 font-medium">Loading your dashboard...</p>
-                </div>
+                <Loader2 className="animate-spin text-indigo-600" size={40} />
             </div>
         );
     }
@@ -73,7 +53,7 @@ const EntrepreneurHome = () => {
         <div className="min-h-screen bg-gray-50">
             <Navbar />
 
-            <main className="max-w-7xl mx-auto px-6 py-10">
+            <main className="max-w-7xl mx-auto px-6 pt-28 pb-10">
                 
                 <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                     <div>
@@ -96,7 +76,6 @@ const EntrepreneurHome = () => {
                     </div>
                 )}
 
-                {/* --- STATS GRID (Dynamic values from DB) --- */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                     {statsList.map((stat, i) => (
                         <div key={i} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5">
@@ -110,8 +89,6 @@ const EntrepreneurHome = () => {
                 </div>
 
                 <div className="grid lg:grid-cols-3 gap-8">
-                    
-                    {/* --- MAIN ACTION CARDS (Left Side) --- */}
                     <div className="lg:col-span-2 space-y-6">
                         <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                             <div className="p-6 border-b border-gray-50 flex justify-between items-center">
@@ -119,62 +96,36 @@ const EntrepreneurHome = () => {
                                 <button onClick={() => navigate('/entrepreneur/my-submissions')} className="text-indigo-600 text-sm font-semibold hover:underline">View All</button>
                             </div>
                             <div className="p-6 space-y-4">
-                                {dashboardData.recentSubmissions.length > 0 ? (
+                                {dashboardData.recentSubmissions?.length > 0 ? (
                                     dashboardData.recentSubmissions.map((sub) => (
                                         <div key={sub._id} className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100">
                                             <div className="flex items-center gap-4">
-                                                <div className="bg-white p-2 rounded-lg shadow-sm">
-                                                    <Rocket className="text-indigo-600" size={20}/>
-                                                </div>
+                                                <div className="bg-white p-2 rounded-lg shadow-sm"><Rocket className="text-indigo-600" size={20}/></div>
                                                 <div>
                                                     <h4 className="font-bold text-gray-900">{sub.title}</h4>
-                                                    <p className="text-xs text-gray-500">
-                                                        Submitted {new Date(sub.createdAt).toLocaleDateString()}
-                                                    </p>
+                                                    <p className="text-xs text-gray-500">Submitted {new Date(sub.createdAt).toLocaleDateString()}</p>
                                                 </div>
                                             </div>
-                                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                                                sub.status === 'Approved' ? 'bg-green-100 text-green-700' : 
-                                                sub.status === 'Rejected' ? 'bg-red-100 text-red-700' : 
-                                                'bg-amber-100 text-amber-700'
-                                            }`}>
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${sub.status === 'Approved' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
                                                 {sub.status || 'Pending'}
                                             </span>
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="text-center py-6 text-gray-400">
-                                        <p>No submissions found. Start by submitting an idea!</p>
-                                    </div>
+                                    <p className="text-center py-6 text-gray-400">No submissions found.</p>
                                 )}
                             </div>
                         </section>
-
-                        <section className="bg-gradient-to-r from-indigo-600 to-violet-700 rounded-2xl p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-indigo-100">
-                            <div className="space-y-2 text-center md:text-left">
-                                <h2 className="text-2xl font-bold">Find your perfect Mentor</h2>
-                                <p className="text-indigo-100 opacity-90">Browse industry experts ready to help you scale.</p>
-                            </div>
-                            <button 
-                                onClick={() => navigate('/entrepreneur/opportunities')}
-                                className="bg-white text-indigo-600 px-6 py-3 rounded-xl font-bold whitespace-nowrap hover:bg-indigo-50 transition-colors"
-                            >
-                                Explore Opportunities
-                            </button>
-                        </section>
                     </div>
 
-                    {/* --- SIDEBAR (Right Side) --- */}
                     <div className="space-y-6">
-                        
                         <div className="bg-indigo-50 rounded-2xl p-6 border border-indigo-100">
                             <h3 className="font-bold text-indigo-900 mb-2">Startup Tip of the Day</h3>
-                            <p className="text-sm text-indigo-700 leading-relaxed">
+                            <p className="text-sm text-indigo-700 leading-relaxed italic">
                                 "Focus on solving a specific problem for a specific group of people. Don't try to build everything at once."
                             </p>
                         </div>
                     </div>
-
                 </div>
             </main>
         </div>
