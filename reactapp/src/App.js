@@ -1,149 +1,76 @@
-import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
-import AdminDashboard from './Admin/AdminDashboard';
-
-// API and Auth
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import api, { setAccessToken } from './Services/api';
 
-// Components
+// Public Components
 import Login from './Components/Login';
 import Signup from './Components/Signup';
+import HomePage from './Components/HomePage';
+import ErrorPage from './Components/ErrorPage';
+import PrivateRoute from './Components/PrivateRoute';
 
-// Dummy Dashboard Components (Replace with your actual files)
-// const Home = () => <div className="p-20 text-white">Entrepreneur Home</div>;
-// const AdminDashboard = () => <div className="p-20 text-white">Admin Dashboard</div>;
-// const MentorDashboard = () => <div className="p-20 text-white">Mentor Dashboard</div>;
+// Admin Components
+import AdminDashboard from './Admin/AdminDashboard';
 
-// --- 1. PROTECTED ROUTE WRAPPER ---
-const ProtectedRoute = ({ children, allowedRoles }) => {
-  const role = localStorage.getItem('role');
-  const tokenExistsInLocalStorage = !!role; // Simplified check
+// Entrepreneur Components
+import SubmitIdea from './EntrepreneurComponents/SubmitIdea';
+import MySubmissions from './EntrepreneurComponents/MySubmissions';
+import ViewStartupOpportunities from './EntrepreneurComponents/ViewStartupOpportunities';
 
-  if (!tokenExistsInLocalStorage) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (allowedRoles && !allowedRoles.includes(role)) {
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
-};
+// Mentor Components
+import StartupSubmissions from './MentorComponents/StartupSubmissions';
+import ViewStartupProfiles from './MentorComponents/ViewStartupProfiles';
+import StartupProfileForm from './MentorComponents/StartupProfileForm';
+import EntrepreneurHome from './EntrepreneurComponents/EntrepreneurHomePage';
 
 function App() {
   const [isInitializing, setIsInitializing] = useState(true);
-  const location = useLocation();
 
-  // --- 2. THE "SILENT REFRESH" ON STARTUP ---
   useEffect(() => {
-    const initAuth = async () => {
+    const refreshStartup = async () => {
       try {
-        // Try to get a new access token using the HttpOnly cookie
-        const res = await api.get('/user/refresh');
+        const res = await api.get("/user/refresh");
         setAccessToken(res.data.accessToken);
       } catch (err) {
-        console.log("No active session found.");
-        // If refresh fails, clear potentially stale local storage
-        if (err.response?.status === 401 || err.response?.status === 403) {
-          localStorage.clear();
-        }
+        console.log("No valid session found");
       } finally {
-        // Stop the global loader
         setIsInitializing(false);
       }
     };
-
-    initAuth();
+    refreshStartup();
   }, []);
 
-  // --- 3. GLOBAL LOADING SCREEN ---
-  if (isInitializing) {
-    return (
-      <div className="h-screen w-full bg-[#002a5c] flex flex-col items-center justify-center text-white">
-        <motion.div
-          animate={{ scale: [1, 1.1, 1], rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-4 shadow-2xl"
-        >
-          <span className="text-[#002a5c] font-black text-2xl">S</span>
-        </motion.div>
-        <div className="flex items-center gap-2 text-blue-200 font-bold text-xs uppercase tracking-[0.3em]">
-          <Loader2 className="animate-spin" size={14} /> Initializing Ecosystem
-        </div>
-      </div>
-    );
-  }
-
+  if (isInitializing) return <div>Loading Secure Session...</div>;
   return (
-    <div className="bg-slate-950 min-h-screen">
-      <AnimatePresence mode="wait">
-        {/* We use location.pathname as a key to trigger animations on route change */}
-        <Routes location={location} key={location.pathname}>
+    <Routes>
+      <Route path="/" element={<Navigate to="/login" />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/home" element={<HomePage />} />
 
-          {/* Public Routes */}
-          <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
-          <Route path="/signup" element={<PageWrapper><Signup /></PageWrapper>} />
 
-          Entrepreneur Routes
-          {/* <Route 
-            path="/home" 
-            element={
-              <ProtectedRoute allowedRoles={['Entrepreneur']}>
-                <PageWrapper><Home /></PageWrapper>
-              </ProtectedRoute>
-            } 
-          /> */}
+      <Route element={<PrivateRoute allowedRoles={['Admin']} />}>
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+      </Route>
 
-          {/* Mentor Routes */}
-          {/* <Route 
-            path="/mentor/dashboard" 
-            element={
-              <ProtectedRoute allowedRoles={['Mentor']}>
-                <PageWrapper><MentorDashboard /></PageWrapper>
-              </ProtectedRoute>
-            } 
-          /> */}
+      <Route element={<PrivateRoute allowedRoles={['Entrepreneur']} />}>
+        <Route path="/entrepreneur/home" element={<EntrepreneurHome />} />
+        <Route path="/entrepreneur/submit-idea" element={<SubmitIdea />} />
+        <Route path="/entrepreneur/my-submissions" element={<MySubmissions />} />
+        <Route path="/entrepreneur/opportunities" element={<ViewStartupOpportunities />} />
+      </Route>
 
-          {/* Admin Routes */}
-          {/* <Route 
-            path="/admin/dashboard" 
-            element={
-              <ProtectedRoute allowedRoles={['Admin']}>
-                <PageWrapper><AdminDashboard /></PageWrapper>
-              </ProtectedRoute>
-            } 
-          /> */}
+      <Route element={<PrivateRoute allowedRoles={['Mentor']} />}>
+        <Route path="/mentor/dashboard" element={<StartupSubmissions />} />
+        <Route path="/mentor/submissions" element={<StartupSubmissions />} />
+        <Route path="/mentor/profiles" element={<ViewStartupProfiles />} />
+        <Route path="/mentor/create-profile" element={<StartupProfileForm />} />
+      </Route>
 
-          {/* Default Redirection */}
-          <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['Admin']}>
-                <PageWrapper><AdminDashboard /></PageWrapper>
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </AnimatePresence>
-    </div>
+      <Route path="*" element={<ErrorPage />} />
+    </Routes>
   );
 }
-
-// --- 4. ANIMATION WRAPPER FOR PAGES ---
-const PageWrapper = ({ children }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-    >
-      {children}
-    </motion.div>
-  );
-};
 
 export default App;
