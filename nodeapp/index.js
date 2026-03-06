@@ -11,8 +11,6 @@ const app = express();
 
 app.use(cors({
     origin: 'https://8081-eaecfaabfcdbbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io', 
-    // Replace this string with the EXACT URL of your frontend browser tab
-    origin: 'https://8081-fdadabacebccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io', 
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"]

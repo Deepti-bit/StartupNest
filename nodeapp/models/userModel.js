@@ -1,59 +1,44 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema(
-  {
-    userName: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-      alias: 'username',
+const startupSubmissionSchema = new mongoose.Schema(
+    {
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true, ref: "User"
+        },
+        userName: { type: String, required: true },
+        startupProfileId: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true, ref: "StartupProfile"
+        },
+
+        submissionDate: {
+            type: Date
+        },
+        marketPotential: {
+            type: Number
+        },
+        launchYear: {
+            type: Date
+        },
+        expectedFunding: {
+            type: Number
+        },
+        status: {
+            type: Number
+        },
+        address: {
+            type: String
+        },
+
+        pitchDeckFile: {
+            type: String,
+            required: true
+        },
     },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-      validate: {
-        validator: (v) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(v),
-        message: "Invalid email format",
-      },
-      lowercase: true,
-    },
-    mobile: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-    },
-    password: {
-      type: String,
-      required: true,
-      validate: {
-        validator: (v) => /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,}$/.test(v),
-        message: "Password must be at least 6 characters, with one uppercase, one lowercase, and one number.",
-      },
-    },
-    role: {
-      type: String,
-      required: true,
-      enum: ['Entrepreneur', 'Mentor', 'Admin'],
-      trim: true,
-    },
-    status: {
-      type: String,
-      enum: ['active', 'pending', 'rejected'],
-      default: 'active',
-    },
-    resumePath: {
-      type: String,
-      default: null,
-    },
-  },
-  {
-    timestamps: true,
-    versionKey: false,
-  }
+    { timestamps: true }
 );
 
-module.exports = mongoose.model('User', userSchema);
+module.exports =
+    mongoose.models.StartupSubmission ||
+    mongoose.model("StartupSubmission", startupSubmissionSchema);
