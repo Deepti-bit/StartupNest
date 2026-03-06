@@ -44,7 +44,7 @@ function App() {
   if (isInitializing) return <div>Loading Secure Session...</div>;
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" />} />
+      <Route path="/" element={<HomePage/>} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/home" element={<HomePage />} />
