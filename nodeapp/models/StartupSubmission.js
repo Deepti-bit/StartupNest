@@ -38,8 +38,8 @@ const startupSubmissionSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      default: "Pending", 
-      enum: ["Pending", "Approved", "Rejected"],
+      default: "Submitted", 
+      enum: ["Submitted", "Shortlisted", "Rejected"],
     },
     address: {
       type: String,
