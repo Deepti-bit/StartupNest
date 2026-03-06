@@ -10,7 +10,7 @@ const userRoute = require('./routers/userRouter');
 const app = express();
 
 app.use(cors({
-    origin: 'https://8081-befbcecccedffbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io', 
+    origin: 'https://8081-eaecfaabfcdbbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io', 
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"]
