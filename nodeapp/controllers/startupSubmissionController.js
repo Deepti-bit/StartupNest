@@ -1,11 +1,9 @@
 const StartupSubmission = require("../models/StartupSubmission");
 
 async function maybePopulate(queryOrPromise, path) {
-  // If jest mocked `.find()` or `.findById()` to return a chainable object
   if (queryOrPromise && typeof queryOrPromise.populate === "function") {
     return await queryOrPromise.populate(path);
   }
-  // If jest mocked to return a Promise (rejected/resolved)
   return await queryOrPromise;
 }
 

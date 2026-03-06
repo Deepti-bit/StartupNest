@@ -24,7 +24,6 @@ const SubmitIdea = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // Get selected mentor profile info from navigation state (as per PDF flow)
   const selectedMentor = location.state?.mentorData || { category: "General", industry: "Tech" };
 
   const {
@@ -39,7 +38,6 @@ const SubmitIdea = () => {
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     
-    // Simulating API call to /startupSubmission/addStartupSubmission (PDF Page 13)
     console.log("Submission Payload:", {
       ...data,
       mentorId: selectedMentor._id,
@@ -58,7 +56,6 @@ const SubmitIdea = () => {
       <EntrepreneurNavbar />
       <Toaster />
 
-      {/* --- BACKGROUND ORBS --- */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-blue-100 rounded-full blur-3xl opacity-50 animate-pulse"></div>
         <div className="absolute bottom-[-10%] left-[-5%] w-96 h-96 bg-indigo-100 rounded-full blur-3xl opacity-50 animate-pulse delay-700"></div>
@@ -90,7 +87,6 @@ const SubmitIdea = () => {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-100 overflow-hidden"
         >
-          {/* Form Banner */}
           <div className="bg-[#003366] p-8 md:p-12 text-white relative overflow-hidden">
             <div className="relative z-10">
               <h1 className="text-3xl md:text-4xl font-black mb-2 tracking-tight flex items-center gap-3">
@@ -104,12 +100,10 @@ const SubmitIdea = () => {
             <Rocket size={180} className="absolute -right-10 -bottom-10 text-white/5 rotate-12" />
           </div>
 
-          {/* --- FORM SECTION --- */}
           <form onSubmit={handleSubmit(onSubmit)} className="p-8 md:p-12 space-y-8">
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               
-              {/* Market Potential */}
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest ml-1">
                   <TrendingUp size={14} className="text-blue-500" /> Market Potential (0-100) *
@@ -127,7 +121,6 @@ const SubmitIdea = () => {
                 {errors.marketPotential && <p className="text-rose-500 text-[10px] font-bold ml-2">{errors.marketPotential.message}</p>}
               </div>
 
-              {/* Expected Funding */}
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest ml-1">
                   <IndianRupee size={14} className="text-blue-500" /> Expected Funding *
@@ -144,7 +137,6 @@ const SubmitIdea = () => {
                 {errors.expectedFunding && <p className="text-rose-500 text-[10px] font-bold ml-2">{errors.expectedFunding.message}</p>}
               </div>
 
-              {/* Launch Year */}
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest ml-1">
                   <CalendarDays size={14} className="text-blue-500" /> Target Launch Year *
@@ -157,7 +149,6 @@ const SubmitIdea = () => {
                 {errors.launchYear && <p className="text-rose-500 text-[10px] font-bold ml-2">{errors.launchYear.message}</p>}
               </div>
 
-              {/* Address */}
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest ml-1">
                   <MapPin size={14} className="text-blue-500" /> Business Location *
@@ -172,7 +163,6 @@ const SubmitIdea = () => {
               </div>
             </div>
 
-            {/* Pitch Deck File Upload */}
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest ml-1">
                 <UploadCloud size={14} className="text-blue-500" /> Pitch Deck (PDF Only) *
@@ -203,7 +193,6 @@ const SubmitIdea = () => {
               {errors.pitchDeck && <p className="text-rose-500 text-[10px] font-bold ml-2">{errors.pitchDeck.message}</p>}
             </div>
 
-            {/* Important Notice */}
             <div className="bg-blue-50/50 p-4 rounded-2xl flex items-start gap-3 border border-blue-100">
                <ShieldCheck className="text-blue-500 shrink-0" size={20} />
                <p className="text-[11px] text-blue-700 leading-relaxed font-medium">
@@ -211,7 +200,6 @@ const SubmitIdea = () => {
                </p>
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={isSubmitting}
@@ -230,7 +218,6 @@ const SubmitIdea = () => {
         </motion.div>
       </main>
 
-      {/* --- SUCCESS MODAL (As per PDF Page 40) --- */}
       <AnimatePresence>
         {showSuccess && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 backdrop-blur-sm bg-slate-900/60">
