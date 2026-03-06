@@ -28,4 +28,17 @@ const validateToken = (req, res, next) => {
   });
 };
 
-module.exports = { generateAccessToken, generateRefreshToken, validateToken, REFRESH_SECRET };
+
+const authorize = (...roles) => {
+  return (req, res, next) => {
+    // Note: We check req.user.role (which was decoded in validateToken)
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({
+        message: `User role '${req.user?.role}' is not authorized to access this route`
+      });
+    }
+    next();
+  };
+};
+
+module.exports = { generateAccessToken, generateRefreshToken, validateToken,authorize, REFRESH_SECRET };

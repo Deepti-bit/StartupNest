@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: "https://8080-eaecfaabfcdbbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io/api",
+  baseURL: "https://8080-eecdbdaddecbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io/api",
   withCredentials: true, // Required to send/receive cookies
 });
 

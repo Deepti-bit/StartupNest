@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      // Fixed the nested validation structure here
+      
       validate: {
         validator: (v) => /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,}$/.test(v),
         message: "Password must be at least 6 characters, with one uppercase, one lowercase, and one number.",
@@ -38,19 +38,22 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       required: true,
-      enum: ['Entrepreneur', 'Mentor', 'Admin'], // Restricts to these 3 roles
+      enum: ['Entrepreneur', 'Mentor', 'Admin'], 
       trim: true,
     },
-    // NEW: Status field for Admin Approval logic
+    
     status: {
       type: String,
       enum: ['active', 'pending', 'rejected'],
-      default: 'active', // Controller logic will switch this to 'pending' for Mentors
+      default: 'active',
     },
-    // NEW: Path to the uploaded resume PDF
+    
     resumePath: {
-      type: String,
-      default: null,
+      data: Buffer,                 
+      contentType: String,          
+      filename: String,             
+      size: Number,                 
+      uploadedAt: { type: Date, default: Date.now }
     },
   },
   {

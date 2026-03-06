@@ -1,73 +1,84 @@
 const StartupSubmission = require("../models/StartupSubmission");
 
-async function maybePopulate(queryOrPromise, path) {
-  // If jest mocked `.find()` or `.findById()` to return a chainable object
-  if (queryOrPromise && typeof queryOrPromise.populate === "function") {
-    return await queryOrPromise.populate(path);
+exports.addStartupSubmission = async (req, res) => {
+  try {
+  
+    const submissionData = {
+      ...req.body,
+      userId: req.user.userId,
+      userName: req.body.userName, 
+      submissionDate: new Date()
+    };
+
+    await StartupSubmission.create(submissionData);
+    return res.status(200).json({ message: "submission is added successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
-  // If jest mocked to return a Promise (rejected/resolved)
-  return await queryOrPromise;
-}
+};
+
+exports.getAllStartupSubmissions = async (req, res) => {
+  try {
+    const submissions = await StartupSubmission.find();
+    return res.status(200).json(submissions);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 exports.getSubmissionsByUserId = async (req, res) => {
   try {
-    const q = StartupSubmission.find({ userId: req.params.userId });
-    const submissions = await maybePopulate(q, "startupProfileId");
+    const submissions = await StartupSubmission.find({ userId: req.params.userId });
     return res.status(200).json(submissions);
-  } catch (err) {
-    return res.status(500).json({ message: "Internal Server Error" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 };
 
 exports.getStartupSubmissionById = async (req, res) => {
   try {
-    const q = StartupSubmission.findById(req.params.id);
-    const submission = await maybePopulate(q, "startupProfileId");
-
+    const submission = await StartupSubmission.findById(req.params.id);
     if (!submission) {
-      return res.status(404).json({ message: "Cannot find any submission" });
+        return res.status(404).json({ message: "submission is not found" });
     }
     return res.status(200).json(submission);
-  } catch (err) {
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-exports.addStartupSubmission = async (req, res) => {
-  try {
-    await StartupSubmission.create(req.body);
-    return res.status(200).json({ message: "Submission added successfully" });
-  } catch (err) {
-    return res.status(500).json({ message: "Internal Server Error" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 };
 
 exports.updateStartupSubmission = async (req, res) => {
   try {
     const updated = await StartupSubmission.findByIdAndUpdate(
-      req.params.id,
-      req.body,
+      req.params.id, 
+      req.body, 
       { new: true }
     );
 
     if (!updated) {
-      return res.status(404).json({ message: "Cannot find any submission" });
+        return res.status(404).json({ message: "submission is not found" });
     }
-    return res.status(200).json({ message: "Submission updated successfully" });
-  } catch (err) {
-    return res.status(500).json({ message: "Internal Server Error" });
+    return res.status(200).json({ message: "submission is updated successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 };
 
 exports.deleteStartupSubmission = async (req, res) => {
   try {
-    const deleted = await StartupSubmission.findByIdAndDelete(req.params.id);
-
-    if (!deleted) {
-      return res.status(404).json({ message: "Cannot find any submission" });
+    const submission = await StartupSubmission.findById(req.params.id);
+    if (!submission) {
+        return res.status(404).json({ message: "submission is not found" });
     }
-    return res.status(200).json({ message: "Submission deleted successfully" });
-  } catch (err) {
-    return res.status(500).json({ message: "Internal Server Error" });
+
+   
+    if (submission.status !== "Pending") {
+      return res.status(400).json({ message: "Cannot delete a submission that is already processed" });
+    }
+
+    await StartupSubmission.findByIdAndDelete(req.params.id);
+    return res.status(200).json({ message: "submission is deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 };
