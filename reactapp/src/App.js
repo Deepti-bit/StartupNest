@@ -3,6 +3,9 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import AdminDashboard from './Admin/AdminDashboard';
+// WRONG PATH
+// CORRECT PATH (based on Page 22 of your PDF)
+import EntrepreneurNavbar from './EntrepreneurComponents/EntrepreneurNavbar';
 
 // API and Auth
 import api, { setAccessToken } from './Services/api';
@@ -11,15 +14,15 @@ import api, { setAccessToken } from './Services/api';
 import Login from './Components/Login';
 import Signup from './Components/Signup';
 
-// Dummy Dashboard Components (Replace with your actual files)
-// const Home = () => <div className="p-20 text-white">Entrepreneur Home</div>;
-// const AdminDashboard = () => <div className="p-20 text-white">Admin Dashboard</div>;
-// const MentorDashboard = () => <div className="p-20 text-white">Mentor Dashboard</div>;
+// Dummy Components for Entrepreneur modules (Replace with your actual files later)
+const Home = () => <div className="p-20 text-white text-center"><h1>Welcome to Entrepreneur Home</h1></div>;
+const MentorOpportunities = () => <div className="p-20 text-white text-center"><h1>Available Mentor Opportunities</h1></div>;
+const MySubmissions = () => <div className="p-20 text-white text-center"><h1>My Startup Submissions</h1></div>;
 
 // --- 1. PROTECTED ROUTE WRAPPER ---
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const role = localStorage.getItem('role');
-  const tokenExistsInLocalStorage = !!role; // Simplified check
+  const tokenExistsInLocalStorage = !!role; 
 
   if (!tokenExistsInLocalStorage) {
     return <Navigate to="/login" replace />;
@@ -36,29 +39,23 @@ function App() {
   const [isInitializing, setIsInitializing] = useState(true);
   const location = useLocation();
 
-  // --- 2. THE "SILENT REFRESH" ON STARTUP ---
   useEffect(() => {
     const initAuth = async () => {
       try {
-        // Try to get a new access token using the HttpOnly cookie
         const res = await api.get('/user/refresh');
         setAccessToken(res.data.accessToken);
       } catch (err) {
         console.log("No active session found.");
-        // If refresh fails, clear potentially stale local storage
         if (err.response?.status === 401 || err.response?.status === 403) {
           localStorage.clear();
         }
       } finally {
-        // Stop the global loader
         setIsInitializing(false);
       }
     };
-
     initAuth();
   }, []);
 
-  // --- 3. GLOBAL LOADING SCREEN ---
   if (isInitializing) {
     return (
       <div className="h-screen w-full bg-[#002a5c] flex flex-col items-center justify-center text-white">
@@ -79,44 +76,44 @@ function App() {
   return (
     <div className="bg-slate-950 min-h-screen">
       <AnimatePresence mode="wait">
-        {/* We use location.pathname as a key to trigger animations on route change */}
         <Routes location={location} key={location.pathname}>
 
           {/* Public Routes */}
           <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
           <Route path="/signup" element={<PageWrapper><Signup /></PageWrapper>} />
 
-          Entrepreneur Routes
-          {/* <Route 
+          {/* --- ENTREPRENEUR ROUTES (NAVBAR ADDED HERE) --- */}
+          <Route 
             path="/home" 
             element={
               <ProtectedRoute allowedRoles={['Entrepreneur']}>
-                <PageWrapper><Home /></PageWrapper>
+                <EntrepreneurNavbar /> {/* Navbar stays fixed at top */}
+                <PageWrapper><Home /></PageWrapper> {/* Page content animates below */}
               </ProtectedRoute>
             } 
-          /> */}
+          />
 
-          {/* Mentor Routes */}
-          {/* <Route 
-            path="/mentor/dashboard" 
+          <Route 
+            path="/mentor-opportunities" 
             element={
-              <ProtectedRoute allowedRoles={['Mentor']}>
-                <PageWrapper><MentorDashboard /></PageWrapper>
+              <ProtectedRoute allowedRoles={['Entrepreneur']}>
+                <EntrepreneurNavbar />
+                <PageWrapper><MentorOpportunities /></PageWrapper>
               </ProtectedRoute>
             } 
-          /> */}
+          />
+
+          <Route 
+            path="/my-submissions" 
+            element={
+              <ProtectedRoute allowedRoles={['Entrepreneur']}>
+                <EntrepreneurNavbar />
+                <PageWrapper><MySubmissions /></PageWrapper>
+              </ProtectedRoute>
+            } 
+          />
 
           {/* Admin Routes */}
-          {/* <Route 
-            path="/admin/dashboard" 
-            element={
-              <ProtectedRoute allowedRoles={['Admin']}>
-                <PageWrapper><AdminDashboard /></PageWrapper>
-              </ProtectedRoute>
-            } 
-          /> */}
-
-          {/* Default Redirection */}
           <Route
             path="/admin/dashboard"
             element={
@@ -125,6 +122,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Default Redirection */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </AnimatePresence>

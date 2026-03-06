@@ -1,0 +1,70 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #0056b3; /* Blue theme from screenshots */
+    padding: 10px 20px;
+    color: white;
+}
+
+.navbar-logo a {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: white;
+    text-decoration: none;
+}
+
+.user-profile-info {
+    background-color: #004494; /* Darker blue capsule */
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 0.9rem;
+}
+
+.logout-btn {
+    background-color: #d9534f; /* Red button as per Page 37 */
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* Modal Styling (Page 43) */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    color: #333;
+}
+
+.modal-buttons {
+    margin-top: 20px;
+}
+
+.confirm-btn {
+    background-color: #28a745; /* Green */
+    color: white; border: none; padding: 10px 20px; margin-right: 10px; cursor: pointer;
+}
+
+.cancel-btn {
+    background-color: #dc3545; /* Red */
+    color: white; border: none; padding: 10px 20px; cursor: pointer;
+}
