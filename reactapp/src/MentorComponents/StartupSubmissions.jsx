@@ -8,19 +8,16 @@ export default function StartupSubmissions() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const token = localStorage.getItem("token") || localStorage.getItem("accessToken");
 
   const load = async () => {
     try {
       setLoading(true);
       setError("");
 
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
       const res = await api.post(
         "/startupSubmission/getAllStartupSubmissions",
         { page: 1, limit: 25, sortBy: "submissionDate", sortOrder: "desc" },
-        { headers }
       );
 
       // ✅ Safe parsing for multiple backend shapes:
@@ -48,12 +45,11 @@ export default function StartupSubmissions() {
 
   const updateStatus = async (id, status) => {
     try {
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
       await api.put(
         `/startupSubmission/updateStartupSubmission/${id}`,
         { status },
-        { headers }
       );
+      setSubs(prev => [...prev,...subs.filter(e => e.id !== id)])
       load();
     } catch (e) {
       console.error(e);
@@ -113,10 +109,10 @@ export default function StartupSubmissions() {
               </div>
 
               <div className="msub-actions">
-                <button className="msub-approve" onClick={() => updateStatus(s._id, 2)}>
+                <button className="msub-approve" onClick={() => updateStatus(s._id, "ShortListed")}>
                   Approve
                 </button>
-                <button className="msub-reject" onClick={() => updateStatus(s._id, 3)}>
+                <button className="msub-reject" onClick={() => updateStatus(s._id, 'Rejected')}>
                   Reject
                 </button>
               </div>

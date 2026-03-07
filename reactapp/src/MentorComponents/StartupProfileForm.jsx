@@ -22,16 +22,6 @@ export default function StartupProfileForm() {
   const submit = async (e) => {
     e.preventDefault();
 
-    const token =
-      localStorage.getItem("token") ||
-      localStorage.getItem("accessToken");
-
-    if (!token) {
-      alert("Session expired. Please login again.");
-      return;
-    }
-
-    // ✅ basic validation (prevents backend crash)
     if (
       !form.category.trim() ||
       !form.description.trim() ||
@@ -46,7 +36,7 @@ export default function StartupProfileForm() {
 
       // ✅ CORRECT ENDPOINT (this fixes 500)
       await api.post(
-        "/startupProfiles",
+        "/startupProfile/addStartupProfile",
         {
           category: form.category.trim(),
           description: form.description.trim(),
@@ -54,12 +44,9 @@ export default function StartupProfileForm() {
           avgEquityExpectation: Number(form.avgEquityExpectation),
           targetIndustry: form.targetIndustry.trim(),
           preferredStage: form.preferredStage,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
         }
+        
+        
       );
 
       alert("Startup Profile created successfully ✅");
