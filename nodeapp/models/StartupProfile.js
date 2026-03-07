@@ -1,49 +1,66 @@
 const mongoose = require('mongoose');
 
-const startupProfileSchema = new mongoose.Schema(
+const startupSubmissionSchema = new mongoose.Schema(
   {
-    mentorId: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
-    category: {
-      type: String,
-      required: true,
-      trim: true,
-      index: 'text',
-    },
-    description: {
+    userName: {
       type: String,
       required: true,
       trim: true,
     },
-    fundingLimit: {
+    startupProfileId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'StartupProfile',
+      required: true,
+    },
+    submissionDate: {
+      type: Date,
+      required: true,
+    },
+    marketPotential: {
       type: Number,
       required: true,
       min: 0,
     },
-    avgEquityExpectation: {
+    launchYear: {
+      type: Date,
+      required: true,
+    },
+    expectedFunding: {
       type: Number,
       required: true,
       min: 0,
     },
-    targetIndustry: {
+    status: {
+      type: String,
+      required: true,
+      default: "Submitted", 
+      enum: ["Submitted", "Shortlisted", "Rejected"],
+    },
+    address: {
       type: String,
       required: true,
       trim: true,
     },
-    preferredStage: {
+    pitchDeckFile: {
       type: String,
-      required: true,
-      enum: ['idea', 'MVP', 'pre-revenue', 'scaling', 'established'],
+      required: true, 
+      trim: true,
     },
   },
   {
+    timestamps: true,
     versionKey: false,
-    timestamps:true
   }
 );
 
-module.exports = mongoose.model('StartupProfile', startupProfileSchema);
+startupSubmissionSchema.index({ userId: 1, submissionDate: -1 });
+startupSubmissionSchema.index({ startupProfileId: 1, submissionDate: -1 });
+startupSubmissionSchema.index({ status: "Submitted" });
+startupSubmissionSchema.index({ userName: 1 }); 
 
+module.exports = mongoose.model('StartupSubmission', startupSubmissionSchema);

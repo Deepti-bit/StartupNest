@@ -6,7 +6,7 @@ const { validateToken, authorize } = require('../authUtils');
 
 router.post('/addStartupSubmission', validateToken, authorize('Entrepreneur'), startupSubmissionController.addStartupSubmission);
 
-router.get('/getAllStartupSubmissions', validateToken, authorize('Mentor'), startupSubmissionController.getAllStartupSubmissions);
+router.post('/getAllStartupSubmissions', validateToken, authorize('Mentor'), startupSubmissionController.getAllStartupSubmissions);
 
 router.get('/getSubmissionsByUserId/:userId', validateToken,authorize('Entrepreneur'), startupSubmissionController.getSubmissionsByUserId);
 
@@ -17,4 +17,5 @@ router.put('/updateStartupSubmission/:id', validateToken, authorize('Mentor'), s
 router.delete('/deleteStartupSubmission/:id', validateToken, authorize('Entrepreneur'), startupSubmissionController.deleteStartupSubmission);
 
 
-module.exports = router;
+module.exports = router
+;
