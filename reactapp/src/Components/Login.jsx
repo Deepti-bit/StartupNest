@@ -4,7 +4,7 @@ import { toast, Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
 import { Eye, EyeOff, Loader2, ShieldCheck } from 'lucide-react';
 import api, { setAccessToken } from '../Services/api';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -20,6 +20,7 @@ const Login = () => {
   const springConfig = { damping: 25, stiffness: 150 };
   const smoothX = useSpring(mouseX, springConfig);
   const smoothY = useSpring(mouseY, springConfig);
+  
 
   const handleLeftPanelMouseMove = (e) => {
     if (!leftPanelRef.current) return;

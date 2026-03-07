@@ -43,9 +43,11 @@ const EntrepreneurNavbar = () => {
   };
 
   const navLinks = [
-    { name: 'Home', path: '/home', icon: <Home size={18} /> },
-    { name: 'Mentor Opportunities', path: '/mentor-opportunities', icon: <Lightbulb size={18} /> },
-    { name: 'My Submissions', path: '/my-submissions', icon: <Send size={18} /> },
+    { name: 'Home', path: '/entrepreneur/home', icon: <Home size={18} /> },
+    { name: 'Mentor Opportunities', path: '/entrepreneur/opportunities', icon: <Lightbulb size={18} /> },
+    { name: 'My Submissions', path: '/entrepreneur/my-submissions', icon: <Send size={18} /> },
+    { name: 'Submit Idea', path: '/entrepreneur/submit-idea', icon: <Send size={18} /> },
+
   ];
 
   return (

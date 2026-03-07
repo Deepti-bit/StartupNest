@@ -6,9 +6,11 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const dir = 'uploads/resumes/';
+
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
         }
@@ -20,7 +22,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({
-    storage: storage,
+    storage: multer.memoryStorage(),
     fileFilter: (req, file, cb) => {
         const ext = path.extname(file.originalname).toLowerCase();
         if (ext !== '.pdf') {
@@ -28,47 +30,84 @@ const upload = multer({
         }
         cb(null, true);
     },
-    limits: { fileSize: 5 * 1024 * 1024 } 
+    limits: { fileSize: 2 * 1024 * 1024 } 
 }).single('resume'); 
+
+
 
 
 exports.addUser = (req, res) => {
     upload(req, res, async (err) => {
-        if (err) return res.status(400).json({ message: err.message });
-
-        try {
-            const { userName, mobile, email, password, role } = req.body;
-
-            const existingUser = await User.findOne({ email });
-            if (existingUser) return res.status(400).json({ message: "Email already exists" });
-
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(password, salt);
-
-            const userStatus = role === 'Mentor' ? 'pending' : 'active';
-            const resumePath = req.file ? req.file.path : null;
-
-            const newUser = await User.create({
-                userName,
-                email,
-                mobile,
-                password: hashedPassword,
-                role,
-                status: userStatus,
-                resumePath: resumePath
-            });
-
-            const successMessage = role === 'Mentor' 
-                ? "Application submitted. Please wait for Admin approval." 
-                : "Registration successful!";
-
-            return res.status(201).json({ message: successMessage });
-        } catch (error) {
-            return res.status(500).json({ message: error.message });
+      if (err) return res.status(400).json({ message: err.message });
+  
+      try {
+        const { userName, mobile, email, password, role } = req.body;
+  
+        
+        if (!["Entrepreneur", "Mentor"].includes(role)) {
+          return res.status(400).json({ message: "Invalid role" });
         }
+  
+        
+        if (role === "Mentor" && !req.file) {
+          return res.status(400).json({ message: "Resume (PDF) is required for Mentors" });
+        }
+  
+        const existingUser = await User.findOne({ email });
+        if (existingUser) return res.status(400).json({ message: "Email already exists" });
+  
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+  
+        const userStatus = role === "Mentor" ? "pending" : "active";
+  
+        const newUserData = {
+          userName,
+          email,
+          mobile,
+          password: hashedPassword,
+          role,
+          status: userStatus
+        };
+  
+        
+        if (role === "Mentor") {
+          newUserData.resume = {
+            data: req.file.buffer,
+            contentType: req.file.mimetype,
+            filename: req.file.originalname,
+            size: req.file.size
+          };
+        }
+  
+        await User.create(newUserData);
+  
+        const msg = role === "Mentor"
+          ? "Application submitted. Please wait for Admin approval."
+          : "Registration successful!";
+  
+        return res.status(201).json({ message: msg });
+      } catch (error) {
+        return res.status(500).json({ message: error.message });
+      }
     });
-};
-
+  };
+  
+  exports.getResumeByUserId = async (req, res) => {
+    try {
+      const user = await User.findById(req.params.id).select("resume role status");
+  
+      if (!user) return res.status(404).json({ message: "User not found" });
+      if (!user.resume?.data) return res.status(404).json({ message: "No resume found" });
+  
+      res.setHeader("Content-Type", user.resume.contentType || "application/pdf");
+      res.setHeader("Content-Disposition", `inline; filename="${user.resume.filename || "resume.pdf"}"`);
+  
+      return res.send(user.resume.data);
+    } catch (e) {
+      return res.status(500).json({ message: e.message });
+    }
+  };
 
 exports.getUserByEmailAndPassword = async (req, res) => {
     try {
@@ -77,8 +116,10 @@ exports.getUserByEmailAndPassword = async (req, res) => {
 
         if (!user) return res.status(404).json({ message: "User not found" });
 
+
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
+
 
         if (user.status === 'pending') {
             return res.status(403).json({ 
@@ -90,6 +131,7 @@ exports.getUserByEmailAndPassword = async (req, res) => {
             return res.status(403).json({ message: "Your application was rejected." });
         }
 
+        
         const accessToken = generateAccessToken(user._id, user.role);
         const refreshToken = generateRefreshToken(user._id);
 
@@ -157,6 +199,33 @@ exports.refreshToken = async (req, res) => {
             const newAccessToken = generateAccessToken(user._id, user.role);
             res.json({ accessToken: newAccessToken });
         });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find({ role: { $ne: 'Admin' } }).select('-password');
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.updateUserByAdmin = async (req, res) => {
+    try {
+        const { userId, role, status } = req.body;
+        
+        const updateData = {};
+        if (role) updateData.role = role;
+        if (status) updateData.status = status;
+
+        const user = await User.findByIdAndUpdate(userId, updateData, { new: true });
+        
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        res.status(200).json({ message: "User updated successfully", user });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

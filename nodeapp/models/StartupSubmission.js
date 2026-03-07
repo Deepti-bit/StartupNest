@@ -1,44 +1,61 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const startupSubmissionSchema = new mongoose.Schema(
-    {
-        userId: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: true, ref: "User"
-        },
-        userName: { type: String, required: true },
-        startupProfileId: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: true, ref: "StartupProfile"
-        },
-
-        submissionDate: {
-            type: Date
-        },
-        marketPotential: {
-            type: Number
-        },
-        launchYear: {
-            type: Date
-        },
-        expectedFunding: {
-            type: Number
-        },
-        status: {
-            type: Number
-        },
-        address: {
-            type: String
-        },
-
-        pitchDeckFile: {
-            type: String,
-            required: true
-        },
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
     },
-    { timestamps: true }
+    userName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    startupProfileId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'StartupProfile',
+      required: true,
+    },
+    submissionDate: {
+      type: Date,
+      required: true,
+    },
+    marketPotential: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    launchYear: {
+      type: Date,
+      required: true,
+    },
+    expectedFunding: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    status: {
+      type: String,
+      required: true,
+      default: "Pending", 
+      enum: ["Pending", "Approved", "Rejected"],
+    },
+    address: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    pitchDeckFile: {
+      type: String,
+      required: true, 
+      trim: true,
+    },
+  },
+  {
+    timestamps: true,
+    versionKey: false,
+  }
 );
 
-module.exports =
-    mongoose.models.StartupSubmission ||
-    mongoose.model("StartupSubmission", startupSubmissionSchema);
+module.exports = mongoose.model('StartupSubmission', startupSubmissionSchema);

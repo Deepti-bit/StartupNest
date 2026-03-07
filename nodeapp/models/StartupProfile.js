@@ -1,19 +1,49 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const startupProfileSchema = new mongoose.Schema(
   {
-    mentorId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
-    category: { type: String, required: true },
-    description: { type: String, required: true },
-
-    fundingLimit: { type: Number },
-    avgEquityExpectation: { type: Number },
-    targetIndustry: { type: String },
-    preferredStage: { type: String },
+    mentorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    category: {
+      type: String,
+      required: true,
+      trim: true,
+      index: 'text',
+    },
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    fundingLimit: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    avgEquityExpectation: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    targetIndustry: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    preferredStage: {
+      type: String,
+      required: true,
+      enum: ['idea', 'MVP', 'pre-revenue', 'scaling', 'established'],
+    },
   },
-  { timestamps: true }
+  {
+    versionKey: false,
+    timestamps:true
+  }
 );
 
-module.exports =
-  mongoose.models.StartupProfile ||
-  mongoose.model("StartupProfile", startupProfileSchema);
+module.exports = mongoose.model('StartupProfile', startupProfileSchema);
+
