@@ -14,7 +14,7 @@ const app = express();
 
 app.use(cors({
     
-    origin: 'https://8081-ecaacccbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io',
+    origin: 'https://8081-eaecfaabfcdbbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io',
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"]
@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api/user', userRoute);
-app.use('/startupProfile', startupProfileRoutes);
+app.use('/api/startupProfile', startupProfileRoutes);
 app.use('/api/startupSubmission', startupSubmissionRoutes);
 
 const MONGO_URI = process.env.MONGO_URI;
