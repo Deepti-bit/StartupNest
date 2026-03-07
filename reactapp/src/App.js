@@ -29,34 +29,33 @@ function AppContent() {
   const { setUser } = useAuth(); 
 
   useEffect(() => {
-    const refreshStartup = async () => {
+    const initAuth = async () => {
       try {
-        // 1. Ask backend for a new token using the HttpOnly cookie
         const res = await api.get("/user/refresh");
         
-        // DEBUG: See exactly what your backend is sending
-        console.log("Session Restore Data:", res.data);
-
+        // 1. Log this to your browser console to see the exact structure
+        console.log("REFRESH RESPONSE:", res.data);
+  
         setAccessToken(res.data.accessToken);
-
-        // 2. Map data carefully (Handles nested 'user' object or flat response)
-        const userData = {
-          role: res.data.role || res.data.user?.role,
-          userName: res.data.userName || res.data.user?.userName || res.data.name || res.data.user?.name,
+        
+        // 2. Map data while handling potential nesting or naming differences
+        const roleFromServer = res.data.role || res.data.user?.role || "";
+        
+        setUser({
+          // Normalize the role: first letter uppercase, rest lowercase
+          role: roleFromServer.charAt(0).toUpperCase() + roleFromServer.slice(1).toLowerCase(),
+          userName: res.data.userName || res.data.user?.userName || res.data.name || "User",
           userId: res.data.ID || res.data._id || res.data.user?.id || res.data.user?._id
-        };
-
-        setUser(userData);
-        console.log("Secure session restored for:", userData.userName);
+        });
+        
       } catch (err) {
-        console.log("No active session found.");
+        console.error("Refresh failed:", err);
         setUser(null);
       } finally {
         setIsInitializing(false);
       }
     };
-
-    refreshStartup();
+    initAuth();
   }, [setUser]);
 
   if (isInitializing) {

@@ -24,7 +24,7 @@ const EntrepreneurNavbar = () => {
   const [notifications] = useState(3); // Mock notification count
 
   // Mock User Data (In real app, get from Redux/Context)
-  const user = { name: "Entrepreneur10", role: "Entrepreneur" };
+  const user = { name: localStorage.getItem("userName"), role: localStorage.getItem("role") };
 
   // Scroll logic for "Floating" effect
   useEffect(() => {

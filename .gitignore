@@ -135,4 +135,5 @@ docker-compose.override.yml
 react/tests/
 nodejest/tests
 nodeadd/.env
-reactapp/src/Services/
+reactapp/src/Services/api.js
+nodeapp/index.js
