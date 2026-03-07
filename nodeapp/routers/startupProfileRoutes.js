@@ -8,7 +8,7 @@ const { validateToken, authorize } = require('../authUtils');
 
 router.get('/getAllStartupProfiles', validateToken, startupProfileController.getAllStartupProfiles);
 router.get('/getStartupProfileById/:id', validateToken, startupProfileController.getStartupProfileById);
-router.get('/getStartupProfilesByMentorId/:mentorId', validateToken, startupProfileController.getStartupProfilesByMentorId);
+router.get('/getStartupProfilesByMentorId/:mentorId', validateToken,authorize('Mentor'), startupProfileController.getStartupProfilesByMentorId);
 
 router.post('/addStartupProfile', validateToken, authorize('Mentor'), startupProfileController.addStartupProfile);
 router.put('/updateStartupProfile/:id', validateToken, authorize('Mentor'), startupProfileController.updateStartupProfile);
