@@ -2,6 +2,8 @@
 import axios from 'axios';
 
 const api = axios.create({
+  baseURL: "https://8080-ecaacccbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io/api",
+  withCredentials: true, // Required to send/receive cookies
   // Use the Examly URL
   baseURL: "https://8080-eaecfaabfcdbbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io/api",
   withCredentials: true,
