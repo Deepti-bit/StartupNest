@@ -4,36 +4,43 @@ const multer = require('multer');
 
 const storage = multer.memoryStorage();
 const upload = multer({ 
-    storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 } 
-}).single('pitchDeck'); 
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 } 
+}).single('pitchDeckFile'); 
 
 exports.addStartupSubmission = (req, res) => {
-  upload(req, res, async (err) => {
-    if (err) return res.status(400).json({ message: err.message });
+upload(req, res, async (err) => {
+  if (err) return res.status(400).json({ message: err.message });
 
-    try {
-      let pitchDeckBase64 = null;
-
-      if (req.file) {
-        const base64String = req.file.buffer.toString('base64');
-        pitchDeckBase64 = `data:application/pdf;base64,${base64String}`;
-      }
-
-      const submissionData = {
-        ...req.body,
-        userId: req.user.userId,
-        userName: req.body.userName, 
-        pitchDeck: pitchDeckBase64, 
-        submissionDate: new Date()
-      };
-
-      await StartupSubmission.create(submissionData);
-      return res.status(200).json({ message: "submission is added successfully" });
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
+  try {
+    let pitchDeckBase64 = null;
+    if (req.file) {
+      const base64String = req.file.buffer.toString('base64');
+      pitchDeckBase64 = `data:application/pdf;base64,${base64String}`;
     }
-  });
+
+    // FIX: Explicitly map every required schema field
+    const submissionData = {
+      userId: req.user.userId || req.user.id, // Check your token payload key
+      userName: req.body.userName,
+      startupProfileId: req.body.startupProfileId,
+      submissionDate: new Date(),
+      marketPotential: Number(req.body.marketPotential),
+      launchYear: new Date(req.body.launchYear),
+      expectedFunding: Number(req.body.expectedFunding),
+      address: req.body.address,
+      pitchDeckFile: pitchDeckBase64, // Matches Schema Field
+      status: "Submitted"
+    };
+
+    await StartupSubmission.create(submissionData);
+    return res.status(200).json({ message: "Submission added successfully" });
+  } catch (error) {
+    console.error(error);
+    // Use 400 for validation errors to help debugging
+    return res.status(400).json({ message: error.message });
+  }
+});
 };
 
 
