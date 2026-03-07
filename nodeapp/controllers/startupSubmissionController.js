@@ -1,21 +1,41 @@
 const StartupSubmission = require("../models/StartupSubmission");
+const multer = require('multer');
 
-exports.addStartupSubmission = async (req, res) => {
-  try {
-  
-    const submissionData = {
-      ...req.body,
-      userId: req.user.userId,
-      userName: req.body.userName, 
-      submissionDate: new Date()
-    };
 
-    await StartupSubmission.create(submissionData);
-    return res.status(200).json({ message: "submission is added successfully" });
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
+const storage = multer.memoryStorage();
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 10 * 1024 * 1024 } 
+}).single('pitchDeck'); 
+
+exports.addStartupSubmission = (req, res) => {
+  upload(req, res, async (err) => {
+    if (err) return res.status(400).json({ message: err.message });
+
+    try {
+      let pitchDeckBase64 = null;
+
+      if (req.file) {
+        const base64String = req.file.buffer.toString('base64');
+        pitchDeckBase64 = `data:application/pdf;base64,${base64String}`;
+      }
+
+      const submissionData = {
+        ...req.body,
+        userId: req.user.userId,
+        userName: req.body.userName, 
+        pitchDeck: pitchDeckBase64, 
+        submissionDate: new Date()
+      };
+
+      await StartupSubmission.create(submissionData);
+      return res.status(200).json({ message: "submission is added successfully" });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  });
 };
+
 
 exports.getAllStartupSubmissions = async (req, res) => {
   try {
