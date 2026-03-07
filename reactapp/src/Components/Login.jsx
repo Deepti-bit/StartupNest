@@ -12,7 +12,6 @@ const Login = () => {
   const [isError, setIsError] = useState(false); 
   const navigate = useNavigate()
 
-  // --- 1. CURSOR TRACKING LOGIC ---
   const leftPanelRef = useRef(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -49,16 +48,14 @@ const Login = () => {
       const response = await api.post("/user/login", data);
   
       if (response.data.accessToken) {
-        // 1. Store token in memory
         setAccessToken(response.data.accessToken);
   
-        // 2. Store info for the UI
         localStorage.setItem('role', response.data.role);
         localStorage.setItem('userName', response.data.userName);
+        localStorage.setItem('userId',response.data.ID)
         
         toast.success(`Access Granted. Welcome, ${response.data.userName}`, { id: loginToast });
         
-        // 3. UPDATED REDIRECTION LOGIC
         setTimeout(() => {
             const role = response.data.role;
   
