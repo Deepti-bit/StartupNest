@@ -30,7 +30,6 @@ const Login = () => {
     mouseY.set(y - 150);
   };
 
-  // --- 2. FORM INITIALIZATION ---
   const { register, handleSubmit, formState: { errors } } = useForm({
     mode: "onChange",
   });
@@ -38,7 +37,6 @@ const Login = () => {
   const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
 
-  // --- 3. LOGIN FUNCTIONALITY ---
   const onSubmit = async (data) => {
     setLoading(true);
     setIsError(false);
@@ -64,7 +62,6 @@ const Login = () => {
             } else if (role === 'Mentor') {
                 navigate('/mentor/dashboard');
             } else if (role === 'Entrepreneur') {
-                // --- THIS IS THE CHANGE ---
                 navigate('/entrepreneur/home');
             } else {
                 navigate('/asd')
