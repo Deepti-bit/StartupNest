@@ -197,8 +197,13 @@ exports.refreshToken = async (req, res) => {
                 return res.status(403).json({ message: "User not authorized" });
             }
 
-            const newAccessToken = generateAccessToken(user._id, user.role);
-            res.json({ accessToken: newAccessToken });
+            const newAccessToken = generateAccessToken(user._id,user.role);
+            res.json({
+                accessToken: newAccessToken,
+                role: user.role,       // <--- App.js needs this
+                userName: user.name,   // <--- App.js needs this
+                ID: user._id           // <--- App.js needs this
+            });
         });
     } catch (error) {
         res.status(500).json({ message: error.message });

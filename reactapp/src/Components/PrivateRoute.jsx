@@ -1,3 +1,4 @@
+// PrivateRoute.jsx
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { getAccessToken } from '../Services/api'; 
@@ -7,31 +8,26 @@ const PrivateRoute = ({ allowedRoles }) => {
     const token = getAccessToken(); 
     const { user } = useAuth();
 
-    // 1. If there is no token at all, send to login
+    // 1. If no token, go to login
     if (!token) {
         return <Navigate to="/login" replace />;
     }
 
-    // 2. IMPORTANT: If token exists but user data hasn't arrived in Context yet,
-    // show nothing (or a small spinner) instead of redirecting to /home.
+    // 2. If we have a token but App.js is still fetching user data, wait
     if (!user) {
-        return null; 
+        return null; // Or a spinner
     }
 
-    // 3. DEBUGGING: Uncomment the line below to see exactly what is failing
-    // console.log("Current User Role:", user.role, "Allowed:", allowedRoles);
-
-    // 4. THE ROLE CHECK (Case-Insensitive Fix)
-    // We convert everything to lowercase to prevent "Entrepreneur" vs "entrepreneur" bugs
-    const hasAccess = allowedRoles.some(role => 
-        role.toLowerCase() === user.role?.toLowerCase()
+    // 3. Case-Insensitive Role Check
+    const hasAccess = allowedRoles.some(
+        (role) => role.toLowerCase() === user.role?.toLowerCase()
     );
 
     if (allowedRoles && !hasAccess) {
+        console.warn(`Access Denied. User role: ${user.role}, Allowed: ${allowedRoles}`);
         return <Navigate to="/home" replace />;
     }
 
-    // 5. Everything is valid, show the page
     return <Outlet />;
 };
 
