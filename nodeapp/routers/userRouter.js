@@ -16,5 +16,6 @@ router.get('/all-users', validateToken, userController.getAllUsers);
 router.put('/update-user', validateToken, authorize("Mentor", "Entrepreneur"), userController.updateUserByAdmin);
 
 router.get("/resume/:id", validateToken, authorize("Admin"), userController.getResumeByUserId);
+router.get('/entrepreneur/dashboard', validateToken, authorize("Mentor", "Entrepreneur"), userController.getEntrepreneurDashboard);
 
 module.exports = router;

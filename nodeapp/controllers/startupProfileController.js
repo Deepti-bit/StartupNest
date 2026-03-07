@@ -1,5 +1,5 @@
+const StartupSubmission = require("../models/StartupSubmission");
 const StartupProfile = require("../models/StartupProfile");
-
 
 exports.getAllStartupProfiles = async (req, res) => {
   try {
@@ -99,3 +99,4 @@ exports.getStartupProfilesByMentorId = async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 };
+
