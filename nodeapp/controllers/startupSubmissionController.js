@@ -39,10 +39,62 @@ exports.addStartupSubmission = (req, res) => {
 
 exports.getAllStartupSubmissions = async (req, res) => {
   try {
-    const submissions = await StartupSubmission.find();
-    return res.status(200).json(submissions);
+    
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      status,
+      sortBy,
+      order
+    } = req.body;
+
+    const skip = (page - 1) * limit;
+
+    
+    const filter = {};
+
+    
+    if (status) {
+      filter.status = status; 
+    }
+
+    
+    if (search) {
+      filter.userName = { $regex: search, $options: "i" };
+    }
+
+    
+    const sortOptions = {};
+    if (sortBy) {
+      sortOptions[sortBy] = order === "asc" ? 1 : -1;
+    } else {
+      sortOptions.submissionDate = -1; 
+    }
+
+    
+    const submissions = await StartupSubmission.find(filter)
+      .populate(
+        "startupProfileId",
+        "category targetIndustry fundingLimit avgEquityExpectation"
+      )
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit);
+
+    
+    const totalCount = await StartupSubmission.countDocuments(filter);
+
+    res.status(200).json({
+      page,
+      limit,
+      totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+      data: submissions,
+    });
+
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
