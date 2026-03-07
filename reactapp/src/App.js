@@ -85,7 +85,7 @@ function AppContent() {
       {/* --- ENTREPRENEUR ROUTES --- */}
       <Route element={<PrivateRoute allowedRoles={['Entrepreneur']} />}>
         <Route path="/entrepreneur/home" element={<EntrepreneurHome />} />
-        <Route path="/entrepreneur/submit-idea" element={<SubmitIdea />} />
+        <Route path="/entrepreneur/submit-idea/:mentorId" element={<SubmitIdea />} />
         <Route path="/entrepreneur/my-submissions" element={<MySubmissions />} />
         <Route path="/entrepreneur/opportunities" element={<ViewStartupOpportunities />} />
       </Route>
