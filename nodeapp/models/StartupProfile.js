@@ -44,6 +44,4 @@ const startupProfileSchema = new mongoose.Schema(
     timestamps:true
   }
 );
-
 module.exports = mongoose.model('StartupProfile', startupProfileSchema);
-

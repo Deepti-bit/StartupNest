@@ -3,11 +3,20 @@ const mongoose = require('mongoose');
 const startupSubmissionSchema = new mongoose.Schema(
   {
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', 
-        required: true,
-      },
-      
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    userName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    startupProfileId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'StartupProfile',
+      required: true,
+    },
     submissionDate: {
       type: Date,
       required: true,
@@ -29,23 +38,29 @@ const startupSubmissionSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      default: "Pending", 
-      enum: ["Pending", "Approved", "Rejected"],
+      default: "Submitted", 
+      enum: ["Submitted", "Shortlisted", "Rejected"],
     },
     address: {
       type: String,
       required: true,
       trim: true,
     },
-    pitchDeck: {
-        type: String, 
-        required: false
-      }
+    pitchDeckFile: {
+      type: String,
+      required: true, 
+      trim: true,
+    },
   },
   {
     timestamps: true,
     versionKey: false,
   }
 );
+
+startupSubmissionSchema.index({ userId: 1, submissionDate: -1 });
+startupSubmissionSchema.index({ startupProfileId: 1, submissionDate: -1 });
+startupSubmissionSchema.index({ status: "Submitted" });
+startupSubmissionSchema.index({ userName: 1 }); 
 
 module.exports = mongoose.model('StartupSubmission', startupSubmissionSchema);
