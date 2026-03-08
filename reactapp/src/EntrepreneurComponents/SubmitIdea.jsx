@@ -1,19 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Rocket, 
-  ArrowLeft, 
-  UploadCloud, 
-  IndianRupee, 
-  MapPin, 
-  TrendingUp, 
-  CalendarDays, 
-  FileCheck,
-  ShieldCheck,
-  Loader2,
-  X
+  Rocket, ArrowLeft, UploadCloud, IndianRupee, MapPin, 
+  TrendingUp, CalendarDays, FileCheck, ShieldCheck, Loader2, Info
 } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
 import EntrepreneurNavbar from './EntrepreneurNavbar';
@@ -22,33 +13,56 @@ import api from '../Services/api';
 const SubmitIdea = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { mentorId } = useParams(); // To fetch from URL ID if needed
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [mentorData, setMentorData] = useState(location.state?.mentorData || null);
 
-  const selectedMentor = location.state?.mentorData || { category: "General", industry: "Tech" };
+  // 1. Fetch Mentor Data if not in location state (URL fallback)
+  useEffect(() => {
+    if (!mentorData && mentorId) {
+      const fetchMentor = async () => {
+        try {
+          const res = await api.get(`/startupProfile/getStartupProfileById/${mentorId}`);
+          setMentorData(res.data);
+        } catch (err) {
+          toast.error("Could not fetch mentor details");
+        }
+      };
+      fetchMentor();
+    }
+  }, [mentorId, mentorData]);
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm({ mode: "onChange" });
-
+  const { register, handleSubmit, watch, formState: { errors } } = useForm({ mode: "onChange" });
   const fileName = watch("pitchDeck");
 
   const onSubmit = async (data) => {
+    // 2. FUNDING LIMIT VALIDATION
+    if (mentorData && Number(data.expectedFunding) > Number(mentorData.fundingLimit)) {
+      toast.error(`Budget exceeds Mentor's limit of ₹${mentorData.fundingLimit.toLocaleString()}`, {
+        duration: 4000,
+        icon: '⚠️'
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const formData = new FormData();
       
+      // Map exactly to what the Backend/Model expects
       formData.append('marketPotential', data.marketPotential);
       formData.append('expectedFunding', data.expectedFunding);
       formData.append('launchYear', data.launchYear);
       formData.append('address', data.address);
-      formData.append('mentorId', selectedMentor._id); // This maps to startupProfileId
+      
+      // FIXING VALIDATION ERRORS:
+      formData.append('startupProfileId', mentorData?._id); // Maps to required field
+      formData.append('userName', localStorage.getItem('userName')); // Fetch from storage
       
       if (data.pitchDeck && data.pitchDeck[0]) {
-        formData.append('pitchDeck', data.pitchDeck[0]);
+        // Field name MUST match multer .single('pitchDeckFile')
+        formData.append('pitchDeckFile', data.pitchDeck[0]); 
       }
 
       await api.post('/startupSubmission/addStartupSubmission', formData, {
@@ -57,8 +71,6 @@ const SubmitIdea = () => {
 
       setIsSubmitting(false);
       setShowSuccess(true);
-      toast.success("Startup Proposal Sent Successfully!");
-      
     } catch (err) {
       setIsSubmitting(false);
       toast.error(err.response?.data?.message || "Submission failed");
@@ -66,167 +78,72 @@ const SubmitIdea = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] font-sans pb-12 overflow-x-hidden">
+    <div className="min-h-screen bg-[#f8fafc] font-sans pb-12">
       <EntrepreneurNavbar />
       <Toaster />
 
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-blue-100 rounded-full blur-3xl opacity-50 animate-pulse"></div>
-        <div className="absolute bottom-[-10%] left-[-5%] w-96 h-96 bg-indigo-100 rounded-full blur-3xl opacity-50 animate-pulse delay-700"></div>
-      </div>
-
       <main className="relative z-10 max-w-4xl mx-auto px-6 pt-28">
-        
-        {/* --- HEADER --- */}
-        <div className="flex items-center justify-between mb-8">
-          <button 
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-slate-500 font-bold hover:text-[#003366] transition-colors group text-sm"
-          >
-            <div className="p-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-all">
-              <ArrowLeft size={18} />
-            </div>
-            Back to Opportunities
-          </button>
-          
-          <div className="text-right">
-            <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-lg border border-blue-100">
-              Pitching to {selectedMentor.category}
-            </span>
-          </div>
-        </div>
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-500 font-bold mb-8">
+          <ArrowLeft size={18} /> Back
+        </button>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-100 overflow-hidden"
-        >
-          <div className="bg-[#003366] p-8 md:p-12 text-white relative overflow-hidden">
-            <div className="relative z-10">
-              <h1 className="text-3xl md:text-4xl font-black mb-2 tracking-tight flex items-center gap-3">
-                Submit Your <span className="text-blue-400">Startup Idea</span>
-                <Rocket className="text-blue-400 animate-bounce" size={28} />
-              </h1>
-              <p className="text-blue-100/70 font-medium max-w-md">
-                Provide the core metrics of your venture. This data will be used by mentors to evaluate your funding potential.
-              </p>
-            </div>
-            <Rocket size={180} className="absolute -right-10 -bottom-10 text-white/5 rotate-12" />
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border">
+          <div className="bg-[#003366] p-8 text-white">
+            <h1 className="text-3xl font-black mb-2">Transmitting to <span className="text-blue-400">{mentorData?.category || "Mentor"}</span></h1>
+            <p className="text-blue-100/70">Category is autofilled based on mentor selection.</p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="p-8 md:p-12 space-y-8">
-            
+          <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               
+              {/* AUTOFILLED CATEGORY */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest ml-1">
-                  <TrendingUp size={14} className="text-blue-500" /> Market Potential (0-100) *
-                </label>
-                <input 
-                  {...register("marketPotential", { 
-                    required: "Score is required", 
-                    min: { value: 1, message: "Min 1" },
-                    max: { value: 100, message: "Max 100" } 
-                  })}
-                  type="number"
-                  placeholder="E.g. 85"
-                  className={`w-full px-5 py-4 bg-slate-50 rounded-2xl border-2 outline-none transition-all ${errors.marketPotential ? 'border-rose-400' : 'border-transparent focus:border-[#003366] focus:bg-white'}`}
-                />
-                {errors.marketPotential && <p className="text-rose-500 text-[10px] font-bold ml-2">{errors.marketPotential.message}</p>}
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Incubation Category</label>
+                <div className="w-full px-5 py-4 bg-slate-100 rounded-2xl border border-slate-200 text-slate-500 font-bold">
+                  {mentorData?.category || "Loading..."}
+                </div>
               </div>
 
+              {/* FUNDING ASK WITH MENTOR LIMIT INFO */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest ml-1">
-                  <IndianRupee size={14} className="text-blue-500" /> Expected Funding *
-                </label>
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Expected Funding (Max: ₹{mentorData?.fundingLimit.toLocaleString()})</label>
                 <div className="relative">
                   <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                   <input 
-                    {...register("expectedFunding", { required: "Funding amount required" })}
+                    {...register("expectedFunding", { required: "Required" })}
                     type="number"
-                    placeholder="E.g. 500000"
-                    className={`w-full pl-10 pr-5 py-4 bg-slate-50 rounded-2xl border-2 outline-none transition-all ${errors.expectedFunding ? 'border-rose-400' : 'border-transparent focus:border-[#003366] focus:bg-white'}`}
+                    className="w-full pl-10 pr-5 py-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-[#003366] outline-none font-bold"
                   />
                 </div>
-                {errors.expectedFunding && <p className="text-rose-500 text-[10px] font-bold ml-2">{errors.expectedFunding.message}</p>}
               </div>
 
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest ml-1">
-                  <CalendarDays size={14} className="text-blue-500" /> Target Launch Year *
-                </label>
-                <input 
-                  {...register("launchYear", { required: "Launch year required" })}
-                  type="date"
-                  className={`w-full px-5 py-4 bg-slate-50 rounded-2xl border-2 outline-none transition-all ${errors.launchYear ? 'border-rose-400' : 'border-transparent focus:border-[#003366] focus:bg-white'}`}
-                />
-                {errors.launchYear && <p className="text-rose-500 text-[10px] font-bold ml-2">{errors.launchYear.message}</p>}
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Market Potential (0-100)</label>
+                <input {...register("marketPotential", { required: true, min: 1, max: 100 })} type="number" className="w-full px-5 py-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-[#003366] outline-none font-bold" />
               </div>
 
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest ml-1">
-                  <MapPin size={14} className="text-blue-500" /> Business Location *
-                </label>
-                <input 
-                  {...register("address", { required: "Location address required" })}
-                  type="text"
-                  placeholder="E.g. Bangalore, India"
-                  className={`w-full px-5 py-4 bg-slate-50 rounded-2xl border-2 outline-none transition-all ${errors.address ? 'border-rose-400' : 'border-transparent focus:border-[#003366] focus:bg-white'}`}
-                />
-                {errors.address && <p className="text-rose-500 text-[10px] font-bold ml-2">{errors.address.message}</p>}
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Launch Date</label>
+                <input {...register("launchYear", { required: true })} type="date" className="w-full px-5 py-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-[#003366] outline-none font-bold" />
+              </div>
+
+              <div className="col-span-full space-y-2">
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Business Address</label>
+                <input {...register("address", { required: true })} type="text" className="w-full px-5 py-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-[#003366] outline-none font-bold" />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest ml-1">
-                <UploadCloud size={14} className="text-blue-500" /> Pitch Deck (PDF Only) *
-              </label>
-              <div className="relative group">
-                <input 
-                  {...register("pitchDeck", { required: false })}
-                  type="file"
-                  accept=".pdf"
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                />
-                <div className={`w-full py-10 border-2 border-dashed rounded-[2rem] flex flex-col items-center justify-center transition-all ${fileName?.length > 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200 group-hover:border-[#003366] group-hover:bg-blue-50/30'}`}>
-                   {fileName?.length > 0 ? (
-                     <>
-                        <FileCheck size={40} className="text-emerald-500 mb-2 animate-bounce" />
-                        <p className="text-sm font-black text-emerald-700">{fileName[0].name}</p>
-                        <p className="text-[10px] font-bold text-emerald-500 mt-1 uppercase">File ready for upload</p>
-                     </>
-                   ) : (
-                     <>
-                        <UploadCloud size={40} className="text-slate-300 mb-2 group-hover:text-blue-500 transition-colors" />
-                        <p className="text-sm font-bold text-slate-500">Drag & drop or <span className="text-blue-600">Browse files</span></p>
-                        <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Max size: 10MB</p>
-                     </>
-                   )}
-                </div>
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Pitch Deck (PDF Only)</label>
+              <div className="relative border-2 border-dashed rounded-[2rem] p-10 text-center hover:bg-slate-50 transition-all">
+                <input {...register("pitchDeck", { required: "Pitch Deck is required" })} type="file" accept=".pdf" className="absolute inset-0 opacity-0 cursor-pointer" />
+                <UploadCloud size={40} className="mx-auto text-slate-300 mb-2" />
+                <p className="text-sm font-bold text-slate-500">{fileName?.[0]?.name || "Upload Pitch Deck"}</p>
               </div>
-              {errors.pitchDeck && <p className="text-rose-500 text-[10px] font-bold ml-2">{errors.pitchDeck.message}</p>}
             </div>
 
-            <div className="bg-blue-50/50 p-4 rounded-2xl flex items-start gap-3 border border-blue-100">
-               <ShieldCheck className="text-blue-500 shrink-0" size={20} />
-               <p className="text-[11px] text-blue-700 leading-relaxed font-medium">
-                 <b>Policy:</b> By submitting, you agree to share your vision with the selected mentor. Proposals cannot be edited once shortlisted or rejected.
-               </p>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`w-full py-5 rounded-[1.5rem] font-black uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3 ${isSubmitting ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-[#003366] text-white hover:shadow-blue-900/20 hover:bg-[#002244]'}`}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 size={20} className="animate-spin" />
-                  Encrypting Proposal...
-                </>
-              ) : (
-                "Transmit Startup Pitch 🚀"
-              )}
+            <button type="submit" disabled={isSubmitting} className="w-full py-5 bg-[#003366] text-white rounded-2xl font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all">
+              {isSubmitting ? "Processing..." : "Submit Proposal"}
             </button>
           </form>
         </motion.div>
@@ -247,7 +164,7 @@ const SubmitIdea = () => {
                <h2 className="text-3xl font-black text-slate-800 mb-2">Successfully Submitted!</h2>
                <p className="text-slate-500 font-medium mb-8">Your startup pitch is now live on the Mentor's desk for evaluation.</p>
                <button 
-                onClick={() => navigate('/my-submissions')}
+                onClick={() => navigate('/entrepreneur/my-submissions')}
                 className="w-full py-4 bg-[#003366] text-white font-black rounded-2xl shadow-lg active:scale-95 transition-all"
                >
                  Go to Dashboard
