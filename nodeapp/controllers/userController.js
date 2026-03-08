@@ -5,7 +5,8 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-
+const StartupSubmission = require("../models/StartupSubmission");
+const StartupProfile = require("../models/StartupProfile");
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -196,8 +197,13 @@ exports.refreshToken = async (req, res) => {
                 return res.status(403).json({ message: "User not authorized" });
             }
 
-            const newAccessToken = generateAccessToken(user._id, user.role);
-            res.json({ accessToken: newAccessToken });
+            const newAccessToken = generateAccessToken(user._id,user.role);
+            res.json({
+                accessToken: newAccessToken,
+                role: user.role,       // <--- App.js needs this
+                userName: user.name,   // <--- App.js needs this
+                ID: user._id           // <--- App.js needs this
+            });
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -226,6 +232,31 @@ exports.updateUserByAdmin = async (req, res) => {
         if (!user) return res.status(404).json({ message: "User not found" });
 
         res.status(200).json({ message: "User updated successfully", user });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.getEntrepreneurDashboard = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+
+        // 1. Count how many ideas this specific user has submitted
+        const ideasCount = await StartupSubmission.countDocuments({ userId });
+
+        // 2. Count how many total Mentor profiles exist in the system
+        const mentorsCount = await StartupProfile.countDocuments();
+
+        // 3. Get the 3 most recent submissions for this user
+        const recentSubmissions = await StartupSubmission.find({ userId })
+            .sort({ submissionDate: -1 })
+            .limit(3);
+
+        res.status(200).json({
+            ideasCount,
+            mentorsCount,
+            recentSubmissions
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

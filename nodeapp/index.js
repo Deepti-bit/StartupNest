@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api/user', userRoute);
-app.use('/startupProfile', startupProfileRoutes);
+app.use('/api/startupProfile', startupProfileRoutes);
 app.use('/api/startupSubmission', startupSubmissionRoutes);
 
 const MONGO_URI = process.env.MONGO_URI;
