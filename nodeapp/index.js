@@ -5,16 +5,20 @@ const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser'); 
 dotenv.config();
 
+const { setupSwagger } = require('./swagger');
 const userRoute = require('./routers/userRouter');
 const startupProfileRoutes = require('./routers/startupProfileRoutes');
 const startupSubmissionRoutes=require('./routers/startupSubmissionRoutes');
 
 const app = express();
 
-
 app.use(cors({
     
+<<<<<<< StartupNest-ayushkattyan11
+    origin: process.env.FRONTEND_URL || 'https://8081-befbcecccedffbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io',
+=======
     origin: 'https://8081-eecdbdaddecbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io',
+>>>>>>> main
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"]
@@ -26,6 +30,8 @@ app.use(cookieParser());
 app.use('/api/user', userRoute);
 app.use('/api/startupProfile', startupProfileRoutes);
 app.use('/api/startupSubmission', startupSubmissionRoutes);
+
+setupSwagger(app);
 
 const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 8080;

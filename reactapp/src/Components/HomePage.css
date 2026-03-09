@@ -1,0 +1,195 @@
+/* ─────────────────────────────────────────────────────────
+   LandingPage.css — StartupNest
+   Every style extracted from <style> blocks and style={{}}
+   inline props. Tailwind utility classes stay in JSX.
+───────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─────────────────────────────────────────────────────────
+   KEYFRAMES
+───────────────────────────────────────────────────────── */
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes pulse-ring {
+  0%, 100% { transform: scale(1);    opacity: 0.5; }
+  50%       { transform: scale(1.08); opacity: 0.2; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0);     }
+  50%       { transform: translateY(-10px); }
+}
+
+/* ─────────────────────────────────────────────────────────
+   UTILITY
+───────────────────────────────────────────────────────── */
+
+.lp-font {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.anim-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────────────────
+   DOT GRID BACKGROUNDS
+   .dot-grid        — hero section (dark dots)
+   .dot-grid-white  — CTA section (white dots)
+───────────────────────────────────────────────────────── */
+
+.dot-grid {
+  background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.dot-grid-white {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.3) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ─────────────────────────────────────────────────────────
+   HERO — radial gradient wash (was inline style on <div>)
+───────────────────────────────────────────────────────── */
+
+.hero-bg-wash {
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 0%,
+    rgba(0, 42, 92, 0.07) 0%,
+    transparent 70%
+  );
+}
+
+/* ─────────────────────────────────────────────────────────
+   HERO HEADLINE — gradient text
+   (was style={{ background, WebkitBackgroundClip, ... }})
+───────────────────────────────────────────────────────── */
+
+.hero-headline-gradient {
+  background: linear-gradient(135deg, #002a5c 0%, #1d4ed8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─────────────────────────────────────────────────────────
+   HERO HEADLINE h1 — letter spacing
+   (was style={{ letterSpacing: '-0.02em' }})
+───────────────────────────────────────────────────────── */
+
+.hero-h1 {
+  letter-spacing: -0.02em;
+}
+
+/* ─────────────────────────────────────────────────────────
+   SOCIAL PROOF AVATARS
+   (was style={{ background: c }} on each avatar div)
+───────────────────────────────────────────────────────── */
+
+.avatar-sv { background: #1e40af; }
+.avatar-rk { background: #065f46; }
+.avatar-am { background: #6d28d9; }
+.avatar-pg { background: #92400e; }
+
+/* ─────────────────────────────────────────────────────────
+   DASHBOARD PREVIEW — stat card "up" colours
+   (was style={{ color: s.color }} on each stat's up text)
+───────────────────────────────────────────────────────── */
+
+.stat-up-blue   { color: #2563eb; }
+.stat-up-green  { color: #059669; }
+.stat-up-purple { color: #7c3aed; }
+
+/* ─────────────────────────────────────────────────────────
+   DASHBOARD PREVIEW — activity avatar backgrounds
+   (was style={{ background: a.color }} on each dot)
+───────────────────────────────────────────────────────── */
+
+.activity-dot-blue   { background: #2563eb; }
+.activity-dot-green  { background: #059669; }
+.activity-dot-purple { background: #7c3aed; }
+
+/* ─────────────────────────────────────────────────────────
+   ANIMATED STATS — number letter spacing
+   (was style={{ letterSpacing: '-0.02em' }})
+───────────────────────────────────────────────────────── */
+
+.stat-number {
+  letter-spacing: -0.02em;
+}
+
+/* ─────────────────────────────────────────────────────────
+   HOW IT WORKS — step badge backgrounds
+   (was style={{ background: step.color }} on each badge)
+───────────────────────────────────────────────────────── */
+
+.step-badge-blue   { background: #2563eb; }
+.step-badge-green  { background: #059669; }
+.step-badge-purple { background: #7c3aed; }
+
+/* ─────────────────────────────────────────────────────────
+   HOW IT WORKS & FEATURES — section headings letter spacing
+   (was style={{ letterSpacing: '-0.02em' }} on each h2)
+───────────────────────────────────────────────────────── */
+
+.section-h2 {
+  letter-spacing: -0.02em;
+}
+
+/* ─────────────────────────────────────────────────────────
+   FEATURES — icon wrapper background + icon colour
+   (was style={{ background: f.bg }} and style={{ color: f.color }})
+───────────────────────────────────────────────────────── */
+
+.feature-icon-blue   { background: #eff6ff; color: #2563eb; }
+.feature-icon-green  { background: #ecfdf5; color: #059669; }
+.feature-icon-purple { background: #f5f3ff; color: #7c3aed; }
+.feature-icon-amber  { background: #fffbeb; color: #d97706; }
+
+/* ─────────────────────────────────────────────────────────
+   TESTIMONIALS — author avatar backgrounds
+   (was style={{ background: t.accent }} on each avatar)
+───────────────────────────────────────────────────────── */
+
+.testimonial-avatar-blue   { background: #2563eb; }
+.testimonial-avatar-green  { background: #059669; }
+.testimonial-avatar-purple { background: #7c3aed; }
+
+/* ─────────────────────────────────────────────────────────
+   CTA SECTION — white dot grid overlay
+   (was two separate inline style={{}} divs)
+───────────────────────────────────────────────────────── */
+
+.cta-glow {
+  background: radial-gradient(
+    ellipse 60% 60% at 50% 50%,
+    rgba(29, 78, 216, 0.3) 0%,
+    transparent 70%
+  );
+}
+
+/* ─────────────────────────────────────────────────────────
+   CTA SECTION — heading letter spacing
+───────────────────────────────────────────────────────── */
+
+.cta-h2 {
+  letter-spacing: -0.02em;
+}
