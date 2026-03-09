@@ -14,11 +14,7 @@ const app = express();
 
 app.use(cors({
     
-<<<<<<< StartupNest-ayushkattyan11
-    origin: process.env.FRONTEND_URL || 'https://8081-befbcecccedffbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io',
-=======
     origin: 'https://8081-eecdbdaddecbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io',
->>>>>>> main
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"]
