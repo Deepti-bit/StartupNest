@@ -29,6 +29,7 @@ const validateToken = (req, res, next) => {
 
 const authorize = (...roles) => {
   return (req, res, next) => {
+    
     // Note: We check req.user.role (which was decoded in validateToken)
     if (!req.user || !roles.includes(req.user.role)) {
       return res.status(403).json({
