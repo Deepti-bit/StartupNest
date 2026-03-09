@@ -4,7 +4,7 @@ import MentorNavbar from "./MentorNavbar";
 import api from "../Services/api";
 
 export default function StartupSubmissions() {
-  const [subs, setSubs] = useState([]);          
+  const [subs, setSubs] = useState([]);          // ✅ ALWAYS array
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 

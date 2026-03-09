@@ -3,49 +3,50 @@ const multer = require('multer');
 
 
 const storage = multer.memoryStorage();
-const upload = multer({
+const upload = multer({ 
   storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }
-}).single('pitchDeckFile');
+  limits: { fileSize: 10 * 1024 * 1024 } 
+}).single('pitchDeckFile'); 
 
 exports.addStartupSubmission = (req, res) => {
-  upload(req, res, async (err) => {
-    if (err) return res.status(400).json({ message: err.message });
+upload(req, res, async (err) => {
+  if (err) return res.status(400).json({ message: err.message });
 
-    try {
-      let pitchDeckBase64 = null;
-      if (req.file) {
-        const base64String = req.file.buffer.toString('base64');
-        pitchDeckBase64 = `data:application/pdf;base64,${base64String}`;
-      }
-
-      // FIX: Explicitly map every required schema field
-      const submissionData = {
-        userId: req.user.userId || req.user.id, // Check your token payload key
-        userName: req.body.userName,
-        startupProfileId: req.body.startupProfileId,
-        submissionDate: new Date(),
-        marketPotential: Number(req.body.marketPotential),
-        launchYear: new Date(req.body.launchYear),
-        expectedFunding: Number(req.body.expectedFunding),
-        address: req.body.address,
-        pitchDeckFile: pitchDeckBase64, // Matches Schema Field
-        status: "Submitted"
-      };
-
-      await StartupSubmission.create(submissionData);
-      return res.status(200).json({ message: "Submission added successfully" });
-    } catch (error) {
-      console.error(error);
-      return res.status(400).json({ message: error.message });
+  try {
+    let pitchDeckBase64 = null;
+    if (req.file) {
+      const base64String = req.file.buffer.toString('base64');
+      pitchDeckBase64 = `data:application/pdf;base64,${base64String}`;
     }
-  });
+
+    // FIX: Explicitly map every required schema field
+    const submissionData = {
+      userId: req.user.userId || req.user.id, // Check your token payload key
+      userName: req.body.userName,
+      startupProfileId: req.body.startupProfileId,
+      submissionDate: new Date(),
+      marketPotential: Number(req.body.marketPotential),
+      launchYear: new Date(req.body.launchYear),
+      expectedFunding: Number(req.body.expectedFunding),
+      address: req.body.address,
+      pitchDeckFile: pitchDeckBase64, // Matches Schema Field
+      status: "Submitted"
+    };
+
+    await StartupSubmission.create(submissionData);
+    return res.status(200).json({ message: "Submission added successfully" });
+  } catch (error) {
+    console.error(error);
+    // Use 400 for validation errors to help debugging
+    return res.status(400).json({ message: error.message });
+  }
+});
 };
 
 
 exports.getAllStartupSubmissions = async (req, res) => {
   try {
-
+    
     const {
       page = 1,
       limit = 10,
@@ -57,28 +58,28 @@ exports.getAllStartupSubmissions = async (req, res) => {
 
     const skip = (page - 1) * limit;
 
-
+    
     const filter = {};
 
-
+    
     if (status) {
-      filter.status = status;
+      filter.status = status; 
     }
 
-
+    
     if (search) {
       filter.userName = { $regex: search, $options: "i" };
     }
 
-
+    
     const sortOptions = {};
     if (sortBy) {
       sortOptions[sortBy] = order === "asc" ? 1 : -1;
     } else {
-      sortOptions.submissionDate = -1;
+      sortOptions.submissionDate = -1; 
     }
 
-
+    
     const submissions = await StartupSubmission.find(filter)
       .populate(
         "startupProfileId",
@@ -88,7 +89,7 @@ exports.getAllStartupSubmissions = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-
+    
     const totalCount = await StartupSubmission.countDocuments(filter);
 
     res.status(200).json({
@@ -117,7 +118,7 @@ exports.getStartupSubmissionById = async (req, res) => {
   try {
     const submission = await StartupSubmission.findById(req.params.id);
     if (!submission) {
-      return res.status(404).json({ message: "submission is not found" });
+        return res.status(404).json({ message: "submission is not found" });
     }
     return res.status(200).json(submission);
   } catch (error) {
@@ -128,13 +129,13 @@ exports.getStartupSubmissionById = async (req, res) => {
 exports.updateStartupSubmission = async (req, res) => {
   try {
     const updated = await StartupSubmission.findByIdAndUpdate(
-      req.params.id,
-      req.body,
+      req.params.id, 
+      req.body, 
       { new: true }
     );
 
     if (!updated) {
-      return res.status(404).json({ message: "submission is not found" });
+        return res.status(404).json({ message: "submission is not found" });
     }
     return res.status(200).json({ message: "submission is updated successfully" });
   } catch (error) {
@@ -146,10 +147,10 @@ exports.deleteStartupSubmission = async (req, res) => {
   try {
     const submission = await StartupSubmission.findById(req.params.id);
     if (!submission) {
-      return res.status(404).json({ message: "submission is not found" });
+        return res.status(404).json({ message: "submission is not found" });
     }
 
-
+   
     if (submission.status !== "Pending") {
       return res.status(400).json({ message: "Cannot delete a submission that is already processed" });
     }
