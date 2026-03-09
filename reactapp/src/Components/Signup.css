@@ -1,0 +1,356 @@
+/* ─────────────────────────────────────────────────────────
+   Signup.css — StartupNest
+   Every style extracted from <style> blocks and style={{}}
+   inline props. Tailwind utility classes stay in JSX.
+───────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ─────────────────────────────────────────────────────────
+   KEYFRAMES
+───────────────────────────────────────────────────────── */
+
+@keyframes snShake {
+  0%,  100% { transform: translateX(0);    }
+  15%        { transform: translateX(-7px); }
+  30%        { transform: translateX(6px);  }
+  45%        { transform: translateX(-4px); }
+  60%        { transform: translateX(3px);  }
+  75%        { transform: translateX(-2px); }
+}
+
+@keyframes btnPulse {
+  0%,  100% { box-shadow: 0 4px 24px rgba(14, 165, 233, 0.35); }
+  50%        { box-shadow: 0 4px 36px rgba(14, 165, 233, 0.55); }
+}
+
+/* ─────────────────────────────────────────────────────────
+   PAGE WRAPPER — font
+   (was style={{ fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif" }})
+───────────────────────────────────────────────────────── */
+
+.signup-page {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* ─────────────────────────────────────────────────────────
+   INPUT OVERRIDES — autofill + caret + placeholder
+───────────────────────────────────────────────────────── */
+
+.sn-inp {
+  color: #0a1628 !important;
+  caret-color: #0ea5e9 !important;
+  background: transparent !important;
+}
+
+.sn-inp::placeholder {
+  color: #94a3b8 !important;
+}
+
+.sn-inp:-webkit-autofill,
+.sn-inp:-webkit-autofill:hover,
+.sn-inp:-webkit-autofill:focus {
+  -webkit-text-fill-color: #0a1628 !important;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  caret-color: #0ea5e9 !important;
+}
+
+/* ─────────────────────────────────────────────────────────
+   FIELD WRAPPER — focus ring
+───────────────────────────────────────────────────────── */
+
+.sn-fw:focus-within {
+  border-color: rgba(14, 165, 233, 0.70) !important;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Field wrapper base shadow
+   (was style={{ boxShadow: '0 1px 4px rgba(0,0,0,.06)' }}) */
+.sn-fw-shadow {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* ─────────────────────────────────────────────────────────
+   FORM SHAKE
+───────────────────────────────────────────────────────── */
+
+.sn-shake {
+  animation: snShake 0.42s ease;
+}
+
+/* ─────────────────────────────────────────────────────────
+   SUBMIT BUTTON
+   (was style={{ background: 'linear-gradient(135deg,…)' }})
+───────────────────────────────────────────────────────── */
+
+.sn-btn {
+  background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 50%, #38bdf8 100%);
+  animation: btnPulse 2.8s ease-in-out infinite;
+}
+
+.sn-btn:hover {
+  animation: none;
+  box-shadow: 0 6px 32px rgba(14, 165, 233, 0.60) !important;
+}
+
+/* Hover shimmer overlay inside button
+   (was style={{ background: 'linear-gradient(135deg,#0369a1,…)' }}) */
+.sn-btn__shimmer {
+  background: linear-gradient(135deg, #0369a1, #0284c7, #0ea5e9);
+}
+
+/* ─────────────────────────────────────────────────────────
+   ROLE CARDS
+   (was style={{ boxShadow, cursor }} + <style> hover rules)
+───────────────────────────────────────────────────────── */
+
+.role-card {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.role-card:hover {
+  border-color: rgba(14, 165, 233, 0.45) !important;
+  transform: translateY(-4px) scale(1.012);
+  box-shadow: 0 16px 48px rgba(14, 165, 233, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+.role-card:hover .role-icon {
+  background: rgba(14, 165, 233, 0.14) !important;
+}
+
+/* Role card icon wrapper
+   (was style={{ background: 'rgba(14,165,233,.08)', color: '#0ea5e9' }}) */
+.role-icon {
+  background: rgba(14, 165, 233, 0.08);
+  color: #0ea5e9;
+  transition: all 0.2s ease;
+}
+
+/* Arrow slide on role card hover
+   (was .role-arrow / .role-card:hover .role-arrow in <style>) */
+.role-arrow {
+  transition: transform 0.2s ease;
+}
+
+.role-card:hover .role-arrow {
+  transform: translateX(4px);
+}
+
+/* Role card title letter-spacing
+   (was style={{ letterSpacing: '-0.02em' }}) */
+.role-card__title {
+  letter-spacing: -0.02em;
+}
+
+/* ─────────────────────────────────────────────────────────
+   LEFT PANEL — dark background
+   (was style={{ background: '#080c14' }})
+───────────────────────────────────────────────────────── */
+
+.left-panel {
+  background: #080c14;
+}
+
+/* Right-edge fade blend
+   (was style={{ background: 'linear-gradient(to right, transparent, #080c14)' }}) */
+.left-panel__edge-fade {
+  background: linear-gradient(to right, transparent, #080c14);
+}
+
+/* ─────────────────────────────────────────────────────────
+   LEFT PANEL — logo squares
+───────────────────────────────────────────────────────── */
+
+/* (was style={{ background: 'linear-gradient(135deg,#38bdf8,#0ea5e9)', opacity: .9 }}) */
+.logo-square--top {
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  opacity: 0.9;
+}
+
+/* (was style={{ background: 'linear-gradient(135deg,#0284c7,#0369a1)', border: '2px solid #080c14' }}) */
+.logo-square--bottom {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  border: 2px solid #080c14;
+}
+
+/* ─────────────────────────────────────────────────────────
+   LEFT PANEL — headline letter-spacing
+   (was style={{ letterSpacing: '-0.03em' }})
+───────────────────────────────────────────────────────── */
+
+.left-headline {
+  letter-spacing: -0.03em;
+}
+
+/* ─────────────────────────────────────────────────────────
+   LEFT PANEL — stat chips
+   (was style={{ background: c, border: `1px solid ${b}` }})
+───────────────────────────────────────────────────────── */
+
+.stat-chip--sky {
+  background: rgba(14, 165, 233, 0.15);
+  border: 1px solid rgba(14, 165, 233, 0.25);
+}
+
+.stat-chip--indigo {
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.stat-chip--emerald {
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.22);
+}
+
+/* Stat chip number letter-spacing
+   (was style={{ letterSpacing: '-0.02em' }}) */
+.stat-chip__number {
+  letter-spacing: -0.02em;
+}
+
+/* ─────────────────────────────────────────────────────────
+   CURSOR BLOB — visual only (x/y stay as Framer motion values)
+   (was style={{ background, filter, borderRadius… }})
+───────────────────────────────────────────────────────── */
+
+.cursor-blob {
+  background: radial-gradient(
+    circle,
+    rgba(14, 165, 233, 0.18) 0%,
+    rgba(99, 102, 241, 0.10) 40%,
+    transparent 70%
+  );
+  filter: blur(55px);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────────────
+   RIGHT PANEL — light background
+   (was style={{ background: '#f0f4f8' }})
+───────────────────────────────────────────────────────── */
+
+.right-panel {
+  background: #f0f4f8;
+}
+
+/* ─────────────────────────────────────────────────────────
+   RIGHT PANEL — dot grid overlay
+   (was style={{ backgroundImage, backgroundSize }})
+───────────────────────────────────────────────────────── */
+
+.right-panel__dot-grid {
+  background-image: radial-gradient(circle, #c8d6e5 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ─────────────────────────────────────────────────────────
+   RIGHT PANEL — ambient glow
+   (was style={{ top, left, width, height, background, filter }})
+───────────────────────────────────────────────────────── */
+
+.right-panel__glow {
+  position: absolute;
+  top: 15%;
+  left: 25%;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(
+    circle,
+    rgba(14, 165, 233, 0.09) 0%,
+    rgba(99, 102, 241, 0.05) 50%,
+    transparent 70%
+  );
+  filter: blur(50px);
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────────────
+   STEP 1 — heading letter-spacing
+   (was style={{ letterSpacing: '-0.025em' }})
+───────────────────────────────────────────────────────── */
+
+.step1-heading {
+  letter-spacing: -0.025em;
+}
+
+/* ─────────────────────────────────────────────────────────
+   STEP 2 — form wrapper max-width
+   (was style={{ maxWidth: 460 }})
+───────────────────────────────────────────────────────── */
+
+.form-wrap {
+  max-width: 460px;
+}
+
+/* Step 2 heading letter-spacing
+   (was style={{ letterSpacing: '-0.025em' }}) */
+.form-heading {
+  letter-spacing: -0.025em;
+}
+
+/* ─────────────────────────────────────────────────────────
+   STEP 2 — role badge icon wrapper
+   (was style={{ background: 'rgba(14,165,233,.12)' }})
+───────────────────────────────────────────────────────── */
+
+.role-badge-icon {
+  background: rgba(14, 165, 233, 0.12);
+}
+
+/* ─────────────────────────────────────────────────────────
+   RESUME UPLOADER — base shadow
+   (was style={{ boxShadow: '0 1px 4px rgba(0,0,0,.05)' }})
+───────────────────────────────────────────────────────── */
+
+.resume-drop-shadow {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* ─────────────────────────────────────────────────────────
+   TOAST — per-type background, border, box-shadow
+   (was style={{ background, border, boxShadow }} on each toast)
+───────────────────────────────────────────────────────── */
+
+.toast-success {
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border: 1px solid #6ee7b7;
+  box-shadow: 0 8px 32px rgba(16, 185, 129, 0.18);
+}
+
+.toast-error {
+  background: linear-gradient(135deg, #fff1f2, #ffe4e6);
+  border: 1px solid #fca5a5;
+  box-shadow: 0 8px 32px rgba(239, 68, 68, 0.18);
+}
+
+.toast-info {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border: 1px solid #7dd3fc;
+  box-shadow: 0 8px 32px rgba(14, 165, 233, 0.18);
+}
+
+/* ─────────────────────────────────────────────────────────
+   TOAST — icon wrapper background
+   (was style={{ background: … }} on icon <div>)
+───────────────────────────────────────────────────────── */
+
+.toast-icon--success { background: rgba(16,  185, 129, 0.15); }
+.toast-icon--error   { background: rgba(239,  68,  68, 0.15); }
+.toast-icon--info    { background: rgba(14,  165, 233, 0.15); }
+
+/* ─────────────────────────────────────────────────────────
+   TOAST — message text colour
+   (was style={{ color: … }} on <p>)
+───────────────────────────────────────────────────────── */
+
+.toast-text--success { color: #065f46; }
+.toast-text--error   { color: #991b1b; }
+.toast-text--info    { color: #0c4a6e; }

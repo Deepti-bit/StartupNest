@@ -23,6 +23,7 @@ import EntrepreneurHome from './EntrepreneurComponents/EntrepreneurHomePage';
 import StartupSubmissions from './MentorComponents/StartupSubmissions';
 import ViewStartupProfiles from './MentorComponents/ViewStartupProfiles';
 import StartupProfileForm from './MentorComponents/StartupProfileForm';
+import MentorDashboard from './MentorComponents/Mentordashboard';
 
 function AppContent() {
   const [isInitializing, setIsInitializing] = useState(true);
@@ -92,7 +93,7 @@ function AppContent() {
 
       {/* --- MENTOR ROUTES --- */}
       <Route element={<PrivateRoute allowedRoles={['Mentor']} />}>
-        <Route path="/mentor/dashboard" element={<StartupSubmissions />} />
+        <Route path="/mentor/dashboard" element={<MentorDashboard />} />
         <Route path="/mentor/submissions" element={<StartupSubmissions />} />
         <Route path="/mentor/profiles" element={<ViewStartupProfiles />} />
         <Route path="/mentor/create-profile" element={<StartupProfileForm />} />
