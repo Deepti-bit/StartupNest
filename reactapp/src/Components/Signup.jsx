@@ -269,8 +269,8 @@ function Field({ name, label, type = 'text', suffix = null, value, onChange, onB
       </label>
       {/* sn-fw-shadow replaces style={{ boxShadow }} */}
       <div className={`sn-fw sn-fw-shadow relative rounded-xl border transition-all duration-200 ${err
-          ? 'border-red-400/70 bg-red-50'
-          : 'border-slate-200 bg-white hover:border-slate-300'
+        ? 'border-red-400/70 bg-red-50'
+        : 'border-slate-200 bg-white hover:border-slate-300'
         }`}>
         <input
           name={name}
@@ -569,8 +569,8 @@ export default function Signup() {
               <div
                 key={s}
                 className={`h-1.5 rounded-full transition-all duration-400 ${s === step ? 'w-8 bg-sky-400' :
-                    s < step ? 'w-4 bg-sky-300' :
-                      'w-4 bg-slate-300'
+                  s < step ? 'w-4 bg-sky-300' :
+                    'w-4 bg-slate-300'
                   }`}
               />
             ))}
@@ -792,8 +792,8 @@ export default function Signup() {
                         </label>
                         {/* resume-drop-shadow replaces style={{ boxShadow }} */}
                         <div className={`resume-drop-shadow relative rounded-xl border-2 border-dashed p-4 flex items-center gap-3 cursor-pointer transition-all duration-200 ${resumeFile
-                            ? 'border-emerald-400 bg-emerald-50'
-                            : 'border-slate-200 bg-white hover:border-sky-400 hover:bg-sky-50/40'
+                          ? 'border-emerald-400 bg-emerald-50'
+                          : 'border-slate-200 bg-white hover:border-sky-400 hover:bg-sky-50/40'
                           }`}>
                           <input
                             type="file"
