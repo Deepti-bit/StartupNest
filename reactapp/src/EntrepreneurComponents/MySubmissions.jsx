@@ -1,10 +1,3 @@
-/**
- * MySubmissions.jsx — StartupNest
- * Full redesign: matches home/opportunities theme, dark/light sync,
- * table + cards layout, details modal, pagination, debounced search,
- * status filter, sort, delete confirm — all functional.
- */
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -16,7 +9,6 @@ import {
 import EntrepreneurNavbar from './EntrepreneurNavbar';
 import api from '../Services/api';
 
-/* ─── theme hook ─── */
 function useTheme() {
   const [isDark, setIsDark] = useState(() => localStorage.getItem('sn-theme') !== 'light');
   useEffect(() => {
@@ -28,7 +20,6 @@ function useTheme() {
   return isDark;
 }
 
-/* ─── self-contained toast ─── */
 let _setToasts = null;
 function ToastContainer() {
   const [toasts, setToasts] = useState([]);
@@ -59,6 +50,8 @@ function ToastContainer() {
     </div>
   );
 }
+
+
 function toast(message, type = 'error', duration = 3500) {
   if (!_setToasts) return;
   const id = Date.now() + Math.random();
@@ -66,11 +59,10 @@ function toast(message, type = 'error', duration = 3500) {
   setTimeout(() => _setToasts(p => p.filter(t => t.id !== id)), duration);
 }
 
-/* ─── Status config ─── */
 const STATUS = {
-  Pending:  { label: 'Pending',  icon: Clock,         color: '#f59e0b', bg: 'rgba(245,158,11,0.12)',  border: 'rgba(245,158,11,0.22)'  },
-  Approved: { label: 'Approved', icon: CheckCircle2,  color: '#10b981', bg: 'rgba(16,185,129,0.12)',  border: 'rgba(16,185,129,0.22)'  },
-  Rejected: { label: 'Rejected', icon: XCircle,       color: '#f43f5e', bg: 'rgba(244,63,94,0.12)',   border: 'rgba(244,63,94,0.22)'   },
+  Pending: { label: 'Pending', icon: Clock, color: '#f59e0b', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.22)' },
+  ShortListed: { label: 'ShortListed', icon: CheckCircle2, color: '#10b981', bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.22)' },
+  Rejected: { label: 'Rejected', icon: XCircle, color: '#f43f5e', bg: 'rgba(244,63,94,0.12)', border: 'rgba(244,63,94,0.22)' },
 };
 
 function StatusBadge({ status }) {
@@ -85,7 +77,28 @@ function StatusBadge({ status }) {
   );
 }
 
-/* ─── Custom Dropdown ─── */
+const handleViewPdf = (base64String) => {
+  try {
+    const base64Parts = base64String.split(',');
+    const base64Data = base64Parts[1];
+
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+
+    const blob = new Blob([byteArray], { type: 'application/pdf' });
+
+    const fileURL = URL.createObjectURL(blob);
+    window.open(fileURL, '_blank');
+  } catch (error) {
+    console.error("Error opening PDF:", error);
+    alert("Could not open PDF. The file might be corrupted.");
+  }
+};
+
 function Dropdown({ value, onChange, options, label, icon: Icon, isDark, textSec, inputBg, inputBdr }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -143,7 +156,6 @@ function Dropdown({ value, onChange, options, label, icon: Icon, isDark, textSec
   );
 }
 
-/* ─── Detail Modal ─── */
 function DetailModal({ sub, onClose, isDark }) {
   if (!sub) return null;
   const card = isDark ? '#0d1628' : '#ffffff';
@@ -244,11 +256,12 @@ function DetailModal({ sub, onClose, isDark }) {
         {/* pitch deck link */}
         {sub.pitchDeckFile && (
           <div className="px-6 pb-5">
-            <a href={sub.pitchDeckFile} target="_blank" rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest text-white transition-all"
+            <button
+              onClick={() => handleViewPdf(sub.pitchDeckFile)}
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest text-white transition-all cursor-pointer"
               style={{ background: 'linear-gradient(135deg,#0284c7,#0ea5e9)', boxShadow: '0 4px 16px rgba(14,165,233,0.30)' }}>
               <FileCheck size={13} /> View Pitch Deck
-            </a>
+            </button>
           </div>
         )}
       </motion.div>
@@ -298,39 +311,38 @@ function DeleteModal({ onConfirm, onCancel, isDark }) {
 const PAGE_SIZE = 6;
 
 const SORT_OPTIONS = [
-  { value: 'newest',       label: 'Newest First' },
-  { value: 'oldest',       label: 'Oldest First' },
+  { value: 'newest', label: 'Newest First' },
+  { value: 'oldest', label: 'Oldest First' },
   { value: 'funding-high', label: 'Funding ↑ High' },
-  { value: 'funding-low',  label: 'Funding ↓ Low' },
-  { value: 'potential',    label: 'Market Potential' },
+  { value: 'funding-low', label: 'Funding ↓ Low' },
+  { value: 'potential', label: 'Market Potential' },
 ];
 
 const STATUS_OPTIONS = [
-  { value: 'all',      label: 'All Status' },
-  { value: 'Pending',  label: 'Pending' },
-  { value: 'Approved', label: 'Approved' },
+  { value: 'all', label: 'All Status' },
+  { value: 'Pending', label: 'Pending' },
+  { value: 'ShortListed', label: 'ShortListed' },
   { value: 'Rejected', label: 'Rejected' },
 ];
 
-/* ════════════════════════════════════════════════════════════
-   MAIN COMPONENT
-════════════════════════════════════════════════════════════ */
+
 const MySubmissions = () => {
   const isDark = useTheme();
 
-  const [submissions,     setSubmissions]     = useState([]);
-  const [loading,         setLoading]         = useState(true);
-  const [rawSearch,       setRawSearch]       = useState('');
-  const [search,          setSearch]          = useState('');
-  const [statusFilter,    setStatusFilter]    = useState('all');
-  const [sortBy,          setSortBy]          = useState('newest');
-  const [page,            setPage]            = useState(1);
-  const [deleteId,        setDeleteId]        = useState(null);
-  const [selectedSub,     setSelectedSub]     = useState(null);
+  const [submissions, setSubmissions] = useState([]);
+  const [totalSubmissions, setTotalSubmissions] = useState(0);
+  const [totalPages,setTotalPages] = useState(1)
+  const [loading, setLoading] = useState(true);
+  const [rawSearch, setRawSearch] = useState('');
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('newest');
+  const [page, setPage] = useState(1);
+  const [deleteId, setDeleteId] = useState(null);
+  const [selectedSub, setSelectedSub] = useState(null);
 
   const userId = localStorage.getItem('userId');
 
-  // ── debounce search ──────────────────────────────────────────────────────
   const debounceRef = useRef(null);
   const handleSearchChange = (val) => {
     setRawSearch(val);
@@ -338,21 +350,34 @@ const MySubmissions = () => {
     debounceRef.current = setTimeout(() => { setSearch(val); setPage(1); }, 350);
   };
 
-  // ── fetch ────────────────────────────────────────────────────────────────
   const fetchSubmissions = useCallback(async () => {
     if (!userId) return;
     try {
       setLoading(true);
-      const res = await api.get(`/startupSubmission/getSubmissionsByUserId/${userId}`);
-      setSubmissions(Array.isArray(res.data) ? res.data : []);
+      const res = await api.get(`/startupSubmission/getSubmissionsByUserId/${userId}`, {
+        params: {
+          page,
+          limit: PAGE_SIZE,
+          search, 
+          status: statusFilter,
+          sortBy
+        }
+      });
+      
+      setSubmissions(res.data.data);
+      setTotalSubmissions(res.data.total);
+      setTotalPages(res.data.totalPages);
     } catch {
       toast('Failed to load submissions.', 'error');
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, page, search, statusFilter, sortBy]); 
 
   useEffect(() => { fetchSubmissions(); }, [fetchSubmissions]);
+
+  
+  const paginated = submissions; 
 
   const handleDelete = async () => {
     try {
@@ -365,7 +390,6 @@ const MySubmissions = () => {
     }
   };
 
-  // ── process data ─────────────────────────────────────────────────────────
   const processed = submissions
     .filter(s => {
       const q = search.toLowerCase();
@@ -378,37 +402,36 @@ const MySubmissions = () => {
     })
     .sort((a, b) => {
       if (sortBy === 'funding-high') return (b.expectedFunding || 0) - (a.expectedFunding || 0);
-      if (sortBy === 'funding-low')  return (a.expectedFunding || 0) - (b.expectedFunding || 0);
-      if (sortBy === 'potential')    return (b.marketPotential || 0) - (a.marketPotential || 0);
-      if (sortBy === 'oldest')       return new Date(a.submissionDate || 0) - new Date(b.submissionDate || 0);
+      if (sortBy === 'funding-low') return (a.expectedFunding || 0) - (b.expectedFunding || 0);
+      if (sortBy === 'potential') return (b.marketPotential || 0) - (a.marketPotential || 0);
+      if (sortBy === 'oldest') return new Date(a.submissionDate || 0) - new Date(b.submissionDate || 0);
       return new Date(b.submissionDate || 0) - new Date(a.submissionDate || 0);
     });
 
-  const totalPages = Math.max(1, Math.ceil(processed.length / PAGE_SIZE));
-  const paginated  = processed.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
 
   // reset page when filters change
   useEffect(() => { setPage(1); }, [statusFilter, sortBy]);
 
   // ── theme tokens ─────────────────────────────────────────────────────────
-  const bg      = isDark ? '#080c14' : '#f0f4f8';
-  const card    = isDark ? '#0d1628' : '#ffffff';
-  const border  = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const bg = isDark ? '#080c14' : '#f0f4f8';
+  const card = isDark ? '#0d1628' : '#ffffff';
+  const border = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
   const textPri = isDark ? '#f1f5f9' : '#0a1628';
   const textSec = isDark ? '#64748b' : '#94a3b8';
   const textMid = isDark ? '#94a3b8' : '#475569';
   const inputBg = isDark ? 'rgba(255,255,255,0.04)' : '#ffffff';
-  const inputBdr= isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+  const inputBdr = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
   const divider = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-  const rowHov  = isDark ? 'rgba(14,165,233,0.04)' : 'rgba(14,165,233,0.03)';
-  const thBg    = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
+  const rowHov = isDark ? 'rgba(14,165,233,0.04)' : 'rgba(14,165,233,0.03)';
+  const thBg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
   const fieldBg = isDark ? 'rgba(255,255,255,0.03)' : '#f8fafc';
 
   // ── stats ────────────────────────────────────────────────────────────────
   const stats = {
-    total:    submissions.length,
+    total: submissions.length,
     approved: submissions.filter(s => s.status === 'Approved').length,
-    pending:  submissions.filter(s => s.status === 'Pending').length,
+    pending: submissions.filter(s => s.status === 'Pending').length,
     rejected: submissions.filter(s => s.status === 'Rejected').length,
   };
 
@@ -469,10 +492,10 @@ const MySubmissions = () => {
             transition={{ delay: .08 }}
             className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-7">
             {[
-              { label: 'Total',    value: stats.total,    color: '#0ea5e9', bg: 'rgba(14,165,233,0.10)'  },
-              { label: 'Approved', value: stats.approved, color: '#10b981', bg: 'rgba(16,185,129,0.10)'  },
-              { label: 'Pending',  value: stats.pending,  color: '#f59e0b', bg: 'rgba(245,158,11,0.10)'  },
-              { label: 'Rejected', value: stats.rejected, color: '#f43f5e', bg: 'rgba(244,63,94,0.10)'   },
+              { label: 'Total', value: stats.total, color: '#0ea5e9', bg: 'rgba(14,165,233,0.10)' },
+              { label: 'Approved', value: stats.approved, color: '#10b981', bg: 'rgba(16,185,129,0.10)' },
+              { label: 'Pending', value: stats.pending, color: '#f59e0b', bg: 'rgba(245,158,11,0.10)' },
+              { label: 'Rejected', value: stats.rejected, color: '#f43f5e', bg: 'rgba(244,63,94,0.10)' },
             ].map((s, i) => (
               <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: .1 + i * .05 }}

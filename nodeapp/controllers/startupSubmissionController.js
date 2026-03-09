@@ -107,10 +107,52 @@ exports.getAllStartupSubmissions = async (req, res) => {
 
 exports.getSubmissionsByUserId = async (req, res) => {
   try {
-    const submissions = await StartupSubmission.find({ userId: req.params.userId });
-    return res.status(200).json(submissions);
+    const { 
+      page = 1, 
+      limit = 6, 
+      search = "", 
+      status = "all", 
+      sortBy = "newest" 
+    } = req.query;
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const filter = { userId: req.params.userId };
+    
+    if (status !== "all") {
+      filter.status = status;
+    }
+
+    if (search) {
+      filter.$or = [
+        { address: { $regex: search, $options: "i" } },
+        { userName: { $regex: search, $options: "i" } }
+      ];
+    }
+
+    let sortOptions = {};
+    if (sortBy === "funding-high") sortOptions = { expectedFunding: -1 };
+    else if (sortBy === "funding-low") sortOptions = { expectedFunding: 1 };
+    else if (sortBy === "potential") sortOptions = { marketPotential: -1 };
+    else if (sortBy === "oldest") sortOptions = { submissionDate: 1 };
+    else sortOptions = { submissionDate: -1 }; 
+
+    const submissions = await StartupSubmission.find(filter)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(Number(limit));
+
+    const totalCount = await StartupSubmission.countDocuments(filter);
+
+    res.status(200).json({
+      total: totalCount,
+      page: Number(page),
+      limit: Number(limit),
+      totalPages: Math.ceil(totalCount / limit),
+      data: submissions,
+    });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 

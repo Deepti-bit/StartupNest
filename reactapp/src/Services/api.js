@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BACKEND_URL = "https://8080-befbcecccedffbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io";
+const BACKEND_URL = "https://8080-eaecfaabfcdbbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io";
 
 const api = axios.create({
   baseURL: `${BACKEND_URL}/api`,
