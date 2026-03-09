@@ -1,8 +1,9 @@
-// api.js
 import axios from 'axios';
 
+const BACKEND_URL = "https://8080-befbcecccedffbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io";
+
 const api = axios.create({
-  baseURL: "https://8080-eaecfaabfcdbbccabcfcbfaabdbcabfebaccfcccce.premiumproject.examly.io/api",
+  baseURL: `${BACKEND_URL}/api`,
   withCredentials: true, // Required to send/receive cookies
   
 });
@@ -16,33 +17,28 @@ export const setAccessToken = (token) => {
 export const getAccessToken = () => accessToken;
 
 api.interceptors.request.use((config) => {
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
-  }
+  if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`;
   return config;
 });
 
+// ── Response interceptor – silent token refresh ──────────────────────────────
 api.interceptors.response.use(
-  (response) => response,
+  (res) => res,
   async (error) => {
-    const prevRequest = error.config;
-    
-    // Check for 401 or 403 (depending on your backend refresh trigger)
-    if ((error.response?.status === 403 || error.response?.status === 401) && !prevRequest._retry) {
-      prevRequest._retry = true;
+    const prev = error.config;
+    if (error.response?.status === 403 && !prev._retry) {
+      prev._retry = true;
       try {
-        // FIX: Use the 'api' instance or a relative path, NOT localhost
-        const res = await api.get("/user/refresh"); 
-        
+        const res = await axios.get(`${BACKEND_URL}/api/user/refresh`, { withCredentials: true });
         accessToken = res.data.accessToken;
-        
-        // Update the header and retry the original request
-        prevRequest.headers.Authorization = `Bearer ${accessToken}`;
-        return api(prevRequest);
-      } catch (refreshErr) {
-        // If refresh fails, clear everything
-        accessToken = null;
-        return Promise.reject(refreshErr);
+        prev.headers.Authorization = `Bearer ${accessToken}`;
+        return api(prev);
+      } catch {
+        clearAccessToken();
+        localStorage.removeItem('role');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('userName');
+        window.location.href = '/login';
       }
     }
     return Promise.reject(error);
